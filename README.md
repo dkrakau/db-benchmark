@@ -1,4 +1,4 @@
-# db-benchmark
+# Erstellung einer Benchmark zur Bestimmung des Verwaltungssystems für den ISCC - Gegenüberstellung von relationalen und Vektordatenbanken
 
 ## Abstrakt
 
