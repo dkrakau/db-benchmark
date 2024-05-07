@@ -1,7 +1,5 @@
 # db-benchmark
 
-hr
-
 ## Abstrakt
 
 Die Verbreitung von Mis- und Desinformationen im Internet wird als die größte Gefahr in den kommenden zwei Jahren eingestuft. Der ISCC könnte dazu beitragen, diese Gefahr zu reduzieren. Das Verwalten der Daten des ISCCs in einer performanten Datenbank ist essenziell, um möglichst effektiv originale Medieninhalte im Internet aufzufinden. In dieser Arbeit soll eine Benchmark entwickelt werden, um die Performanz von Datenbanksystemen in Bezug auf die Verwaltung der Daten des ISCCs bewerten zu können. Die Benchmark wird auf relationale und Vektordatenbanken angewendet. Nach der Auswertung der Ergebnisse wird eine Empfehlung für das zu verwendende Verwaltungssystem für den ISCC abgegeben.
