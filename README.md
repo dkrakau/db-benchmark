@@ -19,5 +19,5 @@ Die Tabelle 1 stellt den geplanten Ablauf der Arbeit dar. Der Zeitplan soll zur 
 | Monat | Aufgabe |
 | --- | --- |
 | Mai | Einarbeitung in PostgreSQL, Milvus, Docker und Benchmarking |
-| Juni - Juli | Entwicklung&Durchführung der Benchmark |
+| Juni - Juli | Entwicklung & Durchführung der Benchmark |
 | August | Erstellen der Präsentation & wissenschaftliche Arbeit |
