@@ -1,11 +1,17 @@
 import { Injectable } from "@nestjs/common";
-import { CreateIndexParam,
+import { BoolResponse, CreateIndexSimpleReq,
     DataType,
+    DeleteReq,
     DescribeCollectionResponse,
     FieldType,
+    FlushReq,
+    GetLoadStateResponse,
     GetVersionResponse,
+    InsertReq,
     MilvusClient,
+    MutationResult,
     ResStatus,
+    RowData,
     SearchParam,
     SearchReq,
     SearchResults,
@@ -26,7 +32,7 @@ export class MilvusProvider {
         return this.client;
     }
 
-    async nns(
+    public async nns(
         collectionName: string,
         vectors: VectorTypes[],
         vectorType: DataType.BinaryVector | DataType.FloatVector, 
@@ -49,14 +55,56 @@ export class MilvusProvider {
         const response = await this.client.search(searchRequirements);
         return response;
     }
+
+    public async insert(collectionName: string, data: RowData[], partitionName?: string): Promise<MutationResult> {
+        const insertRequest: InsertReq = {
+            collection_name: collectionName,
+            data: data
+        }
+        if(partitionName !== null || partitionName !== undefined) {
+            insertRequest["partition_name"] = partitionName;
+        }
+        const response = await this.client.insert(insertRequest);
+        return response;
+    }
+
+    // either insert or update an entity based on whether its primary key already exists
+    public async upsert(collectionName: string, data: RowData[], partitionName?: string): Promise<MutationResult> {
+        const upsertRequest: InsertReq = {
+            collection_name: collectionName,
+            data: data
+        }
+        if(partitionName !== null || partitionName !== undefined) {
+            upsertRequest["partition_name"] = partitionName;
+        }
+        const response = await this.client.upsert(upsertRequest);
+        return response;
+    }
+
+    public async delete(collectionName: string, filter: string, partitionName?: string) {
+        const deleteRequest: DeleteReq = {
+            collection_name: collectionName,
+            filter: filter
+        }
+        if(partitionName !== null || partitionName !== undefined) {
+            deleteRequest["partition_name"] = partitionName;
+        }
+        const response = await this.client.delete(deleteRequest);
+        return response;
+    }
+
+    public async flush(flushReqs: FlushReq) {
+        const response = await this.client.flush(flushReqs);
+        return response;
+    }
     
-    async createCollection(
+    public async createCollection(
         collectionName: string,
         description: string,
         dim: number,
         metricType: string,
         consistencyLevel: 'Strong' | 'Session' | 'Bounded' | 'Eventually' | 'Customized',
-        indexParams: CreateIndexParam,
+        indexParams: CreateIndexSimpleReq,
         fields: FieldType[],
         autoId: boolean): Promise<ResStatus> {
 
@@ -74,14 +122,14 @@ export class MilvusProvider {
         return response;
     }
 
-    async dropCollection(collectionName: string): Promise<ResStatus> {
+    public async dropCollection(collectionName: string): Promise<ResStatus> {
         const response = await this.client.dropCollection({
             collection_name: collectionName
         });
         return response;
     }
 
-    async createPartition(collectionName: string, partitionName: string): Promise<ResStatus> {
+    public async createPartition(collectionName: string, partitionName: string): Promise<ResStatus> {
         const response = await this.client.createPartition({
             collection_name: collectionName,
             partition_name: partitionName
@@ -89,7 +137,7 @@ export class MilvusProvider {
         return response;
     }
 
-    async dropPartition(collectionName: string, partitionName: string): Promise<ResStatus> {
+    public async dropPartition(collectionName: string, partitionName: string): Promise<ResStatus> {
         const response = await this.client.dropPartition({
             collection_name: collectionName,
             partition_name: partitionName
@@ -97,39 +145,77 @@ export class MilvusProvider {
         return response;
     }
 
-    async loadCollection(collectionName: string): Promise<ResStatus> {
+    public async loadCollection(collectionName: string): Promise<ResStatus> {
         const response = await this.client.loadCollection({
             collection_name: collectionName
         });
         return response;
     }
 
-    async releaseCollection(collectionName: string): Promise<ResStatus> {
+    public async releaseCollection(collectionName: string): Promise<ResStatus> {
         const response = await this.client.releaseCollection({
             collection_name: collectionName
         });
         return response;
     }
 
-    async listCollections(): Promise<ShowCollectionsResponse> {
+    public async hasCollection(collectionName: string): Promise<BoolResponse> {
+        const response = await this.client.hasCollection({
+            collection_name: collectionName
+        });
+        return response;
+    } 
+
+    public async getLoadState(collectionName: string): Promise<GetLoadStateResponse> {
+        const response = await this.client.getLoadState({
+            collection_name: collectionName
+        });
+        return response;
+    }
+
+    public async loadPartition(collectionName: string, partitionNames: string[]): Promise<ResStatus> {
+        const response = await this.client.loadPartitions({
+            collection_name: collectionName,
+            partition_names: partitionNames
+        });
+        return response;
+    }
+
+    public async releasePartition(collectionName: string, partitionNames: string[]): Promise<ResStatus> {
+        const response = await this.client.releasePartitions({
+            collection_name: collectionName,
+            partition_names: partitionNames
+        });
+        return response;
+    }
+
+    public async hasPartition(collectionName: string, partitionName: string): Promise<BoolResponse> {
+        const response = await this.client.hasPartition({
+            collection_name: collectionName,
+            partition_name: partitionName
+        });
+        return response;
+    }    
+
+    public async listCollections(): Promise<ShowCollectionsResponse> {
        return await this.client.listCollections();
     }
 
-    async describeColleciton(collectionName: string): Promise<DescribeCollectionResponse> {
+    public async describeColleciton(collectionName: string): Promise<DescribeCollectionResponse> {
         const response = await this.client.describeCollection({
             collection_name: collectionName
         });
         return response;
     }
 
-    async listPartitionsInCollection(collectionName: string): Promise<ShowPartitionsResponse> {
+    public async listPartitionsInCollection(collectionName: string): Promise<ShowPartitionsResponse> {
         const response = await this.client.listPartitions({
             collection_name: collectionName
         })
         return response;
     }
 
-    async getVersion(): Promise<GetVersionResponse> {
+    public async getVersion(): Promise<GetVersionResponse> {
         return await this.client.getVersion();
     }
     
