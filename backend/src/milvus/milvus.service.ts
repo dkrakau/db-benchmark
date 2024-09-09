@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateMilvusDto } from './dto/info-milvus.dto';
 import { UpdateMilvusDto } from './dto/update-milvus.dto';
 import { MilvusProvider } from '../provider/milvus.provider';
-import { BinaryVector, CreateIndexParam, CreateIndexSimpleReq, DataType, DescribeCollectionResponse, FieldType, GetLoadStateResponse, GetVersionResponse, MetricType, ResStatus, SearchResults, ShowCollectionsResponse, ShowPartitionsResponse, VectorTypes } from '@zilliz/milvus2-sdk-node';
+import { BinaryVector, CreateIndexParam, CreateIndexSimpleReq, DataType, DescribeCollectionResponse, FieldType, FlushResult, GetLoadStateResponse, GetVersionResponse, MetricType, ResStatus, SearchResults, ShowCollectionsResponse, ShowPartitionsResponse, VectorTypes } from '@zilliz/milvus2-sdk-node';
 import { ISCCGenerator } from 'src/model/ISCCGenerator.model';
 import { MilvusMessage } from './entities/message.milvus.entity';
 import { start } from 'repl';
@@ -11,7 +11,7 @@ import { Binary } from 'typeorm';
 @Injectable()
 export class MilvusService {
 
-  constructor(private readonly milvusProvider: MilvusProvider, private readonly isccGenerator: ISCCGenerator) { }
+  constructor(private readonly milvusProvider: MilvusProvider, private readonly isccGenerator: ISCCGenerator) {}
 
   public async create(): Promise<MilvusMessage> {
     const indexParams: CreateIndexSimpleReq = {
@@ -43,11 +43,11 @@ export class MilvusService {
     let resPartitionText = null;
     let resPartitionVideo = null;
     try {
-      await this.milvusProvider.createCollection("iscc", "description", 64, MetricType.HAMMING, "Bounded", indexParams, fields, true);
-      await this.milvusProvider.createPartition("iscc", "audio");
-      await this.milvusProvider.createPartition("iscc", "image");
-      await this.milvusProvider.createPartition("iscc", "text");
-      await this.milvusProvider.createPartition("iscc", "video");
+      resColleciton = await this.milvusProvider.createCollection("iscc", "description", 64, MetricType.HAMMING, "Bounded", indexParams, fields, true);
+      resPartitionAudio = await this.milvusProvider.createPartition("iscc", "audio");
+      resPartitionImage = await this.milvusProvider.createPartition("iscc", "image");
+      resPartitionText = await this.milvusProvider.createPartition("iscc", "text");
+      resPartitionVideo = await this.milvusProvider.createPartition("iscc", "video");
     } catch (err) {
       console.error(err);
     }
@@ -75,9 +75,9 @@ export class MilvusService {
     let dataSetText = [];
     let dataSetVideo = [];
 
-    for (let i = 0; i < 976563; i++) { // 976563
+    for (let i = 0; i < 10; i++) { // 976563
 
-      for (let i = 0; i < 1024; i++) { // 1024
+      for (let j = 0; j < 1024; j++) { // 1024
         dataSetAudio.push({ vector: this.isccUnitToBinaryVector(this.isccGenerator.generateUNIT()), asset_id: new Date().getTime() });
         dataSetImage.push({ vector: this.isccUnitToBinaryVector(this.isccGenerator.generateUNIT()), asset_id: new Date().getTime() });
         dataSetText.push({ vector: this.isccUnitToBinaryVector(this.isccGenerator.generateUNIT()), asset_id: new Date().getTime() });
@@ -94,7 +94,8 @@ export class MilvusService {
       dataSetText = [];
       dataSetVideo = [];
 
-      await this.milvusProvider.flush({ collection_names: ["iscc"] });
+      let flushResult: FlushResult = await this.milvusProvider.flush({ collection_names: ["iscc"] });
+      console.log(flushResult);
     }
 
     const endTime = new Date().getTime();
@@ -114,6 +115,7 @@ export class MilvusService {
     for (let i = 0; i < 64; i = i + 8) {
       bytes.push(parseInt(isccUnit.substring(i, i + 8), 2));
     }
+    console.log(bytes);
     return bytes;
   }
 

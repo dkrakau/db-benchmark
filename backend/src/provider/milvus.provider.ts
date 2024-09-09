@@ -5,6 +5,7 @@ import { BoolResponse, CreateIndexSimpleReq,
     DescribeCollectionResponse,
     FieldType,
     FlushReq,
+    FlushResult,
     GetLoadStateResponse,
     GetVersionResponse,
     InsertReq,
@@ -93,7 +94,7 @@ export class MilvusProvider {
         return response;
     }
 
-    public async flush(flushReqs: FlushReq) {
+    public async flush(flushReqs: FlushReq): Promise<FlushResult> {
         const response = await this.client.flush(flushReqs);
         return response;
     }
