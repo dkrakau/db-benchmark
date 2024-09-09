@@ -5,8 +5,11 @@ import { CreateIndexParam,
     GetVersionResponse,
     MilvusClient,
     ResStatus,
+    SearchParam,
+    SearchResults,
     ShowCollectionsResponse,
-    ShowPartitionsResponse } from "@zilliz/milvus2-sdk-node";
+    ShowPartitionsResponse, 
+    VectorTypes} from "@zilliz/milvus2-sdk-node";
 
 @Injectable()
 export class MilvusProvider {
@@ -19,6 +22,26 @@ export class MilvusProvider {
 
     getClient(): MilvusClient {
         return this.client;
+    }
+
+    async nns(
+        collectionName: string,
+        vectors: VectorTypes[], 
+        partitionNames: string[],
+        searchParams: SearchParam,
+        outputFields: string[],
+        limit: number): Promise<SearchResults> {
+        
+        const response = await this.client.search({
+            collection_name: collectionName,
+            vectors: vectors,
+            partition_names: partitionNames,
+            search_params: searchParams,
+            output_fields: outputFields,
+            limit: limit,
+        });
+
+        return response;
     }
     
     async createCollection(
