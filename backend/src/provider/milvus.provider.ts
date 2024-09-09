@@ -1,11 +1,13 @@
 import { Injectable } from "@nestjs/common";
 import { CreateIndexParam,
+    DataType,
     DescribeCollectionResponse,
     FieldType,
     GetVersionResponse,
     MilvusClient,
     ResStatus,
     SearchParam,
+    SearchReq,
     SearchResults,
     ShowCollectionsResponse,
     ShowPartitionsResponse, 
@@ -26,21 +28,25 @@ export class MilvusProvider {
 
     async nns(
         collectionName: string,
-        vectors: VectorTypes[], 
-        partitionNames: string[],
+        vectors: VectorTypes[],
+        vectorType: DataType.BinaryVector | DataType.FloatVector, 
         searchParams: SearchParam,
         outputFields: string[],
-        limit: number): Promise<SearchResults> {
-        
-        const response = await this.client.search({
+        partitionNames?: string[]): Promise<SearchResults> {
+
+        let searchRequirements: SearchReq = {
             collection_name: collectionName,
             vectors: vectors,
-            partition_names: partitionNames,
+            vector_type: vectorType,
             search_params: searchParams,
-            output_fields: outputFields,
-            limit: limit,
-        });
-
+            output_fields: outputFields
+        };
+        
+        if (partitionNames !== null || partitionNames !== undefined) {
+            searchRequirements["partitionNames"] = partitionNames;
+        }
+        
+        const response = await this.client.search(searchRequirements);
         return response;
     }
     
