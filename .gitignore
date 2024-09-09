@@ -1,5 +1,6 @@
-### Databases ###
-databases/
+### Folders ###
+databases/milvus/volumes/
+docs/
 
 ### Batch ###
 # BatchFiles
