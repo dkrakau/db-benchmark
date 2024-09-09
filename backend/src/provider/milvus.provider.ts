@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { BoolResponse, CreateIndexSimpleReq,
+import {
+    BoolResponse, CreateIndexSimpleReq,
     DataType,
     DeleteReq,
     DescribeCollectionResponse,
@@ -8,6 +9,9 @@ import { BoolResponse, CreateIndexSimpleReq,
     FlushResult,
     GetLoadStateResponse,
     GetVersionResponse,
+    HybridSearchReq,
+    ImportReq,
+    ImportResponse,
     InsertReq,
     MilvusClient,
     MutationResult,
@@ -16,13 +20,24 @@ import { BoolResponse, CreateIndexSimpleReq,
     SearchParam,
     SearchReq,
     SearchResults,
+    SearchSimpleReq,
     ShowCollectionsResponse,
-    ShowPartitionsResponse, 
-    VectorTypes} from "@zilliz/milvus2-sdk-node";
+    ShowPartitionsResponse,
+    VectorTypes
+} from "@zilliz/milvus2-sdk-node";
+
+export interface NNSParams {
+    collectionName: string,
+    vectors: VectorTypes[],
+    vectorType: DataType.BinaryVector | DataType.FloatVector,
+    searchParams: SearchParam,
+    outputFields: string[],
+    partitionNames?: string[]
+}
 
 @Injectable()
 export class MilvusProvider {
-    
+
     client: MilvusClient;
 
     constructor() {
@@ -33,27 +48,8 @@ export class MilvusProvider {
         return this.client;
     }
 
-    public async nns(
-        collectionName: string,
-        vectors: VectorTypes[],
-        vectorType: DataType.BinaryVector | DataType.FloatVector, 
-        searchParams: SearchParam,
-        outputFields: string[],
-        partitionNames?: string[]): Promise<SearchResults> {
-
-        let searchRequirements: SearchReq = {
-            collection_name: collectionName,
-            vectors: vectors,
-            vector_type: vectorType,
-            search_params: searchParams,
-            output_fields: outputFields
-        };
-        
-        if (partitionNames !== null || partitionNames !== undefined) {
-            searchRequirements["partitionNames"] = partitionNames;
-        }
-        
-        const response = await this.client.search(searchRequirements);
+    public async nns(request: SearchReq | SearchSimpleReq | HybridSearchReq): Promise<SearchResults> {
+        const response: SearchResults = await this.client.search(request);
         return response;
     }
 
@@ -62,10 +58,18 @@ export class MilvusProvider {
             collection_name: collectionName,
             data: data
         }
-        if(partitionName !== null || partitionName !== undefined) {
+        if (partitionName !== null || partitionName !== undefined) {
             insertRequest["partition_name"] = partitionName;
         }
-        const response = await this.client.insert(insertRequest);
+        const response: MutationResult = await this.client.insert(insertRequest);
+        return response;
+    }
+
+    public async bulkInsert(data: ImportReq): Promise<ImportResponse> {
+        /* if (partitionName !== null || partitionName !== undefined) {
+            insertRequest["partition_name"] = partitionName;
+        } */
+        const response: ImportResponse = await this.client.bulkInsert(data);
         return response;
     }
 
@@ -75,22 +79,22 @@ export class MilvusProvider {
             collection_name: collectionName,
             data: data
         }
-        if(partitionName !== null || partitionName !== undefined) {
+        if (partitionName !== null || partitionName !== undefined) {
             upsertRequest["partition_name"] = partitionName;
         }
-        const response = await this.client.upsert(upsertRequest);
+        const response: MutationResult = await this.client.upsert(upsertRequest);
         return response;
     }
 
-    public async delete(collectionName: string, filter: string, partitionName?: string) {
+    public async delete(collectionName: string, filter: string, partitionName?: string): Promise<MutationResult> {
         const deleteRequest: DeleteReq = {
             collection_name: collectionName,
             filter: filter
         }
-        if(partitionName !== null || partitionName !== undefined) {
+        if (partitionName !== null || partitionName !== undefined) {
             deleteRequest["partition_name"] = partitionName;
         }
-        const response = await this.client.delete(deleteRequest);
+        const response: MutationResult = await this.client.delete(deleteRequest);
         return response;
     }
 
@@ -98,7 +102,7 @@ export class MilvusProvider {
         const response = await this.client.flush(flushReqs);
         return response;
     }
-    
+
     public async createCollection(
         collectionName: string,
         description: string,
@@ -109,7 +113,7 @@ export class MilvusProvider {
         fields: FieldType[],
         autoId: boolean): Promise<ResStatus> {
 
-        const response = await this.client.createCollection({
+        const response: ResStatus = await this.client.createCollection({
             collection_name: collectionName,
             description: description,
             dimension: dim,
@@ -118,20 +122,20 @@ export class MilvusProvider {
             index_params: indexParams,
             fields: fields,
             auto_id: autoId
-            });
+        });
 
         return response;
     }
 
     public async dropCollection(collectionName: string): Promise<ResStatus> {
-        const response = await this.client.dropCollection({
+        const response: ResStatus = await this.client.dropCollection({
             collection_name: collectionName
         });
         return response;
     }
 
     public async createPartition(collectionName: string, partitionName: string): Promise<ResStatus> {
-        const response = await this.client.createPartition({
+        const response: ResStatus = await this.client.createPartition({
             collection_name: collectionName,
             partition_name: partitionName
         });
@@ -139,7 +143,7 @@ export class MilvusProvider {
     }
 
     public async dropPartition(collectionName: string, partitionName: string): Promise<ResStatus> {
-        const response = await this.client.dropPartition({
+        const response: ResStatus = await this.client.dropPartition({
             collection_name: collectionName,
             partition_name: partitionName
         });
@@ -147,35 +151,35 @@ export class MilvusProvider {
     }
 
     public async loadCollection(collectionName: string): Promise<ResStatus> {
-        const response = await this.client.loadCollection({
+        const response: ResStatus = await this.client.loadCollection({
             collection_name: collectionName
         });
         return response;
     }
 
     public async releaseCollection(collectionName: string): Promise<ResStatus> {
-        const response = await this.client.releaseCollection({
+        const response: ResStatus = await this.client.releaseCollection({
             collection_name: collectionName
         });
         return response;
     }
 
     public async hasCollection(collectionName: string): Promise<BoolResponse> {
-        const response = await this.client.hasCollection({
+        const response: BoolResponse = await this.client.hasCollection({
             collection_name: collectionName
         });
         return response;
-    } 
+    }
 
     public async getLoadState(collectionName: string): Promise<GetLoadStateResponse> {
-        const response = await this.client.getLoadState({
+        const response: GetLoadStateResponse = await this.client.getLoadState({
             collection_name: collectionName
         });
         return response;
     }
 
     public async loadPartition(collectionName: string, partitionNames: string[]): Promise<ResStatus> {
-        const response = await this.client.loadPartitions({
+        const response: ResStatus = await this.client.loadPartitions({
             collection_name: collectionName,
             partition_names: partitionNames
         });
@@ -183,7 +187,7 @@ export class MilvusProvider {
     }
 
     public async releasePartition(collectionName: string, partitionNames: string[]): Promise<ResStatus> {
-        const response = await this.client.releasePartitions({
+        const response: ResStatus = await this.client.releasePartitions({
             collection_name: collectionName,
             partition_names: partitionNames
         });
@@ -191,26 +195,26 @@ export class MilvusProvider {
     }
 
     public async hasPartition(collectionName: string, partitionName: string): Promise<BoolResponse> {
-        const response = await this.client.hasPartition({
+        const response: BoolResponse = await this.client.hasPartition({
             collection_name: collectionName,
             partition_name: partitionName
         });
         return response;
-    }    
+    }
 
     public async listCollections(): Promise<ShowCollectionsResponse> {
-       return await this.client.listCollections();
+        return await this.client.listCollections();
     }
 
     public async describeColleciton(collectionName: string): Promise<DescribeCollectionResponse> {
-        const response = await this.client.describeCollection({
+        const response: DescribeCollectionResponse = await this.client.describeCollection({
             collection_name: collectionName
         });
         return response;
     }
 
     public async listPartitionsInCollection(collectionName: string): Promise<ShowPartitionsResponse> {
-        const response = await this.client.listPartitions({
+        const response: ShowPartitionsResponse = await this.client.listPartitions({
             collection_name: collectionName
         })
         return response;
@@ -219,5 +223,5 @@ export class MilvusProvider {
     public async getVersion(): Promise<GetVersionResponse> {
         return await this.client.getVersion();
     }
-    
+
 }

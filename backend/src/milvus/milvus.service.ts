@@ -1,17 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { CreateMilvusDto } from './dto/info-milvus.dto';
-import { UpdateMilvusDto } from './dto/update-milvus.dto';
 import { MilvusProvider } from '../provider/milvus.provider';
-import { BinaryVector, CreateIndexParam, CreateIndexSimpleReq, DataType, DescribeCollectionResponse, FieldType, FlushResult, GetLoadStateResponse, GetVersionResponse, MetricType, ResStatus, SearchResults, ShowCollectionsResponse, ShowPartitionsResponse, VectorTypes } from '@zilliz/milvus2-sdk-node';
+import { BinaryVector, ConsistencyLevelEnum, CreateIndexParam, CreateIndexSimpleReq, DataType, DescribeCollectionResponse, FieldType, FlushResult, GetLoadStateResponse, GetVersionResponse, MetricType, ResStatus, SearchParam, SearchReq, SearchResults, SearchSimpleReq, ShowCollectionsResponse, ShowPartitionsResponse, VectorTypes } from '@zilliz/milvus2-sdk-node';
 import { ISCCGenerator } from 'src/model/ISCCGenerator.model';
 import { MilvusMessage } from './entities/message.milvus.entity';
-import { start } from 'repl';
-import { Binary } from 'typeorm';
+
 
 @Injectable()
 export class MilvusService {
 
-  constructor(private readonly milvusProvider: MilvusProvider, private readonly isccGenerator: ISCCGenerator) {}
+  constructor(private readonly milvusProvider: MilvusProvider, private readonly isccGenerator: ISCCGenerator) { }
 
   public async create(): Promise<MilvusMessage> {
     const indexParams: CreateIndexSimpleReq = {
@@ -78,10 +75,10 @@ export class MilvusService {
     for (let i = 0; i < 10; i++) { // 976563
 
       for (let j = 0; j < 1024; j++) { // 1024
-        dataSetAudio.push({ vector: this.isccUnitToBinaryVector(this.isccGenerator.generateUNIT()), asset_id: new Date().getTime() });
-        dataSetImage.push({ vector: this.isccUnitToBinaryVector(this.isccGenerator.generateUNIT()), asset_id: new Date().getTime() });
-        dataSetText.push({ vector: this.isccUnitToBinaryVector(this.isccGenerator.generateUNIT()), asset_id: new Date().getTime() });
-        dataSetVideo.push({ vector: this.isccUnitToBinaryVector(this.isccGenerator.generateUNIT()), asset_id: new Date().getTime() });
+        dataSetAudio.push({ vector: await this.unitToBinaryVector(this.isccGenerator.generateUNIT()), asset_id: new Date().getTime() });
+        dataSetImage.push({ vector: await this.unitToBinaryVector(this.isccGenerator.generateUNIT()), asset_id: new Date().getTime() });
+        dataSetText.push({ vector: await this.unitToBinaryVector(this.isccGenerator.generateUNIT()), asset_id: new Date().getTime() });
+        dataSetVideo.push({ vector: await this.unitToBinaryVector(this.isccGenerator.generateUNIT()), asset_id: new Date().getTime() });
       }
 
       await this.milvusProvider.insert("iscc", dataSetAudio, "audio");
@@ -110,25 +107,57 @@ export class MilvusService {
     return Math.floor(seconds / 3600) + ":" + Math.floor(seconds / 60 % 60) + ":" + (seconds % 60)
   }
 
-  private async isccUnitToBinaryVector(isccUnit: string): Promise<BinaryVector> {
+  private async unitToBinaryVector(unit: string): Promise<BinaryVector> {
     let bytes: number[] = [];
     for (let i = 0; i < 64; i = i + 8) {
-      bytes.push(parseInt(isccUnit.substring(i, i + 8), 2));
+      bytes.push(parseInt(unit.substring(i, i + 8), 2));
     }
-    console.log(bytes);
     return bytes;
   }
+  private async binaryVectorToUnit(vec: BinaryVector): Promise<string> {
+    let unit = "";
+    for (let i = 0; i < vec.length; i++) {
+      let unitSegment = "";
+      let binaryString = (vec[i] >>> 0).toString(2);
+      let numberOfZerosToFill = 8 - binaryString.length;
+      if (numberOfZerosToFill !== 0) {
+        for (let i = 0; i < numberOfZerosToFill; i++) {
+          unitSegment = unitSegment + "0";
+        }
+        unitSegment = unitSegment + binaryString;
+      } else {
+        unitSegment = binaryString;
+      }
+      unit = unit + unitSegment;
+    }
+    return unit;
+  }
 
-  public async test(isccUnit: string, mode: string): Promise<SearchResults> {
-    const searchVector: BinaryVector = await this.isccUnitToBinaryVector(isccUnit);
-    console.log(searchVector);
-    const searchParams = {
+  public async test(unit: string, mode: string): Promise<SearchResults> {
+
+    const searchVector: BinaryVector = await this.unitToBinaryVector(unit);
+
+    const searchParam: SearchParam = {
       anns_field: "vector",
-      topk: 100,
+      topk: 50,
       metric_type: MetricType.HAMMING,
       params: JSON.stringify({ nprobe: 10 })
     };
-    return await this.milvusProvider.nns("iscc", [searchVector], DataType.BinaryVector, searchParams, ["asset_id"], [mode]);
+    const searchReq: SearchReq = {
+      anns_field: "vector",
+      collection_name: "iscc",
+      partition_names: ["image"],
+      vectors: [searchVector],
+      vector_type: DataType.BinaryVector,
+      search_params: searchParam,
+      consistency_level: ConsistencyLevelEnum.Bounded,
+      output_fields: ["id", "vector", "asset_id"]
+    }
+
+    let response: SearchResults = await this.milvusProvider.nns(searchReq);
+    console.log({ id: response.results[0].id, unit: await this.binaryVectorToUnit(response.results[0]["vector"]), distance: response.results[0].score });
+
+    return response;
   }
 
   public async info(): Promise<MilvusMessage> {
