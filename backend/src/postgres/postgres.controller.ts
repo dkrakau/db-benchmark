@@ -1,46 +1,48 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { PostgresService } from './postgres.service';
-import { CreatePostgreDto } from './dto/create-postgre.dto';
-import { UpdatePostgreDto } from './dto/update-postgre.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Query } from "@nestjs/common";
+import { ApiOkResponse, ApiQuery, ApiTags } from "@nestjs/swagger";
+import { PostgresService } from "./postgres.service";
+import { TestRequestDto } from "./request-dto/test.request.dto";
+import { InfoResponseDto } from "./response-dto/info.response.dto";
+import { TestResponseDto } from "./response-dto/test.response.dto";
+
+
+export enum Modes {
+  audio = "audio",
+  image = "image",
+  text = "text",
+  video = "video"
+}
 
 @ApiTags("PostgreSQL")
-@Controller('postgres')
+@Controller("postgres")
 export class PostgresController {
-  constructor(private readonly postgresService: PostgresService) {}
 
-  @Get("create")
-  create(@Body() createMilvusDto: CreatePostgreDto) {
-    return this.postgresService.create(createMilvusDto);
+  constructor(private readonly postgresService: PostgresService) { }
+
+  @Get("fill")
+  setup() {
+    return this.postgresService.fill();
   }
 
-  @Get("drop")
-  drop(@Body() createMilvusDto: CreatePostgreDto) {
-    return this.postgresService.create(createMilvusDto);
-  }
-
-  @Get("setup")
-  setup(@Body() createMilvusDto: CreatePostgreDto) {
-    return this.postgresService.create(createMilvusDto);
-  }
-
-  @Get("testing")
-  testing(@Body() createMilvusDto: CreatePostgreDto) {
-    return this.postgresService.create(createMilvusDto);
+  @Get("/test")
+  @ApiQuery({ name: "unit", required: true, description: "Binary iscc string", schema: { type: "string" }, example: "0110011110101100001111100000111010011111011101001000000011110111" })
+  @ApiQuery({ name: "mode", enum: Modes, required: true, description: "Mode of unit", schema: { type: "string" }, example: "image" })
+  @ApiOkResponse({
+    description: "Result",
+    type: TestResponseDto,
+    isArray: false
+  })
+  test(@Query() testRequestDto: TestRequestDto): TestResponseDto {
+    return this.postgresService.test(testRequestDto);
   }
 
   @Get("info")
-  info() {
-    return this.postgresService.findAll();
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePostgreDto: UpdatePostgreDto) {
-    return this.postgresService.update(+id, updatePostgreDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.postgresService.remove(+id);
+  @ApiOkResponse({
+    description: "Result",
+    type: InfoResponseDto,
+    isArray: false
+  })
+  info(): Promise<InfoResponseDto> {
+    return this.postgresService.info();
   }
 }

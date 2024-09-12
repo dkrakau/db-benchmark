@@ -1,8 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { PostgresController } from './postgres.controller';
-import { PostgresService } from './postgres.service';
+import { Test, TestingModule } from "@nestjs/testing";
+import { PostgresController } from "./postgres.controller";
+import { PostgresService } from "./postgres.service";
 
-describe('PostgresController', () => {
+
+describe("PostgresController", () => {
   let controller: PostgresController;
 
   beforeEach(async () => {
@@ -14,7 +15,7 @@ describe('PostgresController', () => {
     controller = module.get<PostgresController>(PostgresController);
   });
 
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(controller).toBeDefined();
   });
 });

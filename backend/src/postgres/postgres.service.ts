@@ -1,26 +1,41 @@
-import { Injectable } from '@nestjs/common';
-import { CreatePostgreDto } from './dto/create-postgre.dto';
-import { UpdatePostgreDto } from './dto/update-postgre.dto';
+import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { Asset } from "./entities/asset.entity";
+import { AudioUnit, ImageUnit, TextUnit, VideoUnit } from "./entities/unit.entity";
+import { TestRequestDto } from "./request-dto/test.request.dto";
+import { InfoResponseDto } from "./response-dto/info.response.dto";
+
 
 @Injectable()
 export class PostgresService {
-  create(createPostgreDto: CreatePostgreDto) {
-    return 'This action adds a new postgre';
+
+  constructor(
+    @InjectRepository(Asset) private readonly assetRepository: Repository<Asset>,
+    @InjectRepository(AudioUnit) private readonly audioUnitRepository: Repository<AudioUnit>,
+    @InjectRepository(ImageUnit) private readonly imageUnitRepository: Repository<ImageUnit>,
+    @InjectRepository(TextUnit) private readonly textUnitRepository: Repository<TextUnit>,
+    @InjectRepository(VideoUnit) private readonly videoUnitRepository: Repository<VideoUnit>
+  ) { }
+
+  fill() {
+    return "";
   }
 
-  findAll() {
-    return `This action returns all postgres`;
+  test(testRequestDto: TestRequestDto): TestRequestDto {
+    return testRequestDto;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} postgre`;
-  }
+  async info(): Promise<InfoResponseDto> {
 
-  update(id: number, updatePostgreDto: UpdatePostgreDto) {
-    return `This action updates a #${id} postgre`;
-  }
+    const infoResponseDto: InfoResponseDto = {
+      asset_count: await this.assetRepository.count(),
+      audio_unit_count: await this.audioUnitRepository.count(),
+      image_unit_count: await this.imageUnitRepository.count(),
+      text_unit_count: await this.textUnitRepository.count(),
+      video_unit_count: await this.videoUnitRepository.count()
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} postgre`;
+    return infoResponseDto;
   }
 }
