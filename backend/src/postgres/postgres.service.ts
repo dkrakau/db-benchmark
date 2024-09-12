@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { CreatePostgreDto } from './dto/create-postgre.dto';
-import { UpdatePostgreDto } from './dto/update-postgre.dto';
+import { SearchPostgreDto } from './dto/search.postgres.dto';
+
 
 @Injectable()
 export class PostgresService {
-  create(createPostgreDto: CreatePostgreDto) {
+  create(createPostgreDto: SearchPostgreDto) {
     return 'This action adds a new postgre';
   }
 
@@ -16,7 +16,7 @@ export class PostgresService {
     return `This action returns a #${id} postgre`;
   }
 
-  update(id: number, updatePostgreDto: UpdatePostgreDto) {
+  update(id: number, updatePostgreDto: SearchPostgreDto) {
     return `This action updates a #${id} postgre`;
   }
 

@@ -1,31 +1,30 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { PostgresService } from './postgres.service';
-import { CreatePostgreDto } from './dto/create-postgre.dto';
-import { UpdatePostgreDto } from './dto/update-postgre.dto';
+import { SearchPostgreDto } from './dto/search.postgres.dto';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags("PostgreSQL")
 @Controller('postgres')
 export class PostgresController {
-  constructor(private readonly postgresService: PostgresService) {}
+  constructor(private readonly postgresService: PostgresService) { }
 
   @Get("create")
-  create(@Body() createMilvusDto: CreatePostgreDto) {
+  create(@Body() createMilvusDto: SearchPostgreDto) {
     return this.postgresService.create(createMilvusDto);
   }
 
   @Get("drop")
-  drop(@Body() createMilvusDto: CreatePostgreDto) {
+  drop(@Body() createMilvusDto: SearchPostgreDto) {
     return this.postgresService.create(createMilvusDto);
   }
 
   @Get("setup")
-  setup(@Body() createMilvusDto: CreatePostgreDto) {
+  setup(@Body() createMilvusDto: SearchPostgreDto) {
     return this.postgresService.create(createMilvusDto);
   }
 
   @Get("testing")
-  testing(@Body() createMilvusDto: CreatePostgreDto) {
+  testing(@Body() createMilvusDto: SearchPostgreDto) {
     return this.postgresService.create(createMilvusDto);
   }
 
@@ -35,7 +34,7 @@ export class PostgresController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePostgreDto: UpdatePostgreDto) {
+  update(@Param('id') id: string, @Body() updatePostgreDto: SearchPostgreDto) {
     return this.postgresService.update(+id, updatePostgreDto);
   }
 
