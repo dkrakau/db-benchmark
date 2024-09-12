@@ -4,6 +4,7 @@ import { Repository } from "typeorm";
 import { Asset } from "./entities/asset.entity";
 import { AudioUnit, ImageUnit, TextUnit, VideoUnit } from "./entities/unit.entity";
 import { TestRequestDto } from "./request-dto/test.request.dto";
+import { InfoResponseDto } from "./response-dto/info.response.dto";
 
 
 @Injectable()
@@ -16,13 +17,6 @@ export class PostgresService {
     @InjectRepository(TextUnit) private readonly textUnitRepository: Repository<TextUnit>,
     @InjectRepository(VideoUnit) private readonly videoUnitRepository: Repository<VideoUnit>
   ) { }
-  create() {
-    return "";
-  }
-
-  drop() {
-    return "";
-  }
 
   fill() {
     return "";
@@ -32,7 +26,16 @@ export class PostgresService {
     return testRequestDto;
   }
 
-  info() {
-    return "";
+  async info(): Promise<InfoResponseDto> {
+
+    const infoResponseDto: InfoResponseDto = {
+      asset_count: await this.assetRepository.count(),
+      audio_unit_count: await this.audioUnitRepository.count(),
+      image_unit_count: await this.imageUnitRepository.count(),
+      text_unit_count: await this.textUnitRepository.count(),
+      video_unit_count: await this.videoUnitRepository.count()
+    }
+
+    return infoResponseDto;
   }
 }
