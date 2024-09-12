@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { SearchPostgresDto } from './dto/search.postgres.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Asset } from './entities/asset.entity';
-import { AudioUnit, ImageUnit, TextUnit, VideoUnit } from './entities/unit.entity';
+import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { Asset } from "./entities/asset.entity";
+import { AudioUnit, ImageUnit, TextUnit, VideoUnit } from "./entities/unit.entity";
+import { TestRequestDto } from "./request-dto/test.request.dto";
+
 
 @Injectable()
 export class PostgresService {
@@ -27,8 +28,8 @@ export class PostgresService {
     return "";
   }
 
-  test(searchPostgreDto: SearchPostgresDto): SearchPostgresDto {
-    return searchPostgreDto;
+  test(testRequestDto: TestRequestDto): TestRequestDto {
+    return testRequestDto;
   }
 
   info() {

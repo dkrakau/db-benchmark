@@ -1,17 +1,18 @@
-import { Module } from '@nestjs/common';
-import { MilvusModule } from './milvus/milvus.module';
-import { PostgresModule } from './postgres/postgres.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '@nestjs/config';
-import { Asset } from './postgres/entities/asset.entity';
-import { AudioUnit, ImageUnit, TextUnit, VideoUnit } from './postgres/entities/unit.entity';
+import { Module } from "@nestjs/common";
+import { ConfigModule } from "@nestjs/config";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { MilvusModule } from "./milvus/milvus.module";
+import { Asset } from "./postgres/entities/asset.entity";
+import { AudioUnit, ImageUnit, TextUnit, VideoUnit } from "./postgres/entities/unit.entity";
+import { PostgresModule } from "./postgres/postgres.module";
+
 
 @Module({
   imports:
     [
       ConfigModule.forRoot({ isGlobal: true }),
       TypeOrmModule.forRoot({
-        type: 'postgres',
+        type: "postgres",
         host: process.env.POSTGRES_HOST,
         port: parseInt(<string>process.env.POSTGRES_PORT),
         username: process.env.POSTGRES_USER,
