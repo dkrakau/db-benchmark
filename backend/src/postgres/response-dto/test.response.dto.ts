@@ -1,7 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsEnum, IsNotEmpty, IsString, Matches } from "class-validator";
 
-export class SearchPostgresDto {
+export class Test {
 
     @ApiProperty()
     @IsString()
@@ -12,7 +12,7 @@ export class SearchPostgresDto {
     @ApiProperty()
     @IsString()
     @IsNotEmpty()
-    @IsEnum(['audio', 'image', 'text', 'video'])
+    @IsEnum(["audio", "image", "text", "video"])
     mode: string;
 
 }
