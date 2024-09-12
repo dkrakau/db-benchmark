@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
-export abstract class UnitEntity {
+export abstract class Unit {
 
     @PrimaryGeneratedColumn()
     id: number;
@@ -15,13 +15,13 @@ export abstract class UnitEntity {
 }
 
 @Entity()
-export class AudioUnitEntity extends UnitEntity { }
+export class AudioUnit extends Unit { }
 
 @Entity()
-export class ImageUnitEntity extends UnitEntity { }
+export class ImageUnit extends Unit { }
 
 @Entity()
-export class TextUnitEntity extends UnitEntity { }
+export class TextUnit extends Unit { }
 
 @Entity()
-export class VideoUnitEntity extends UnitEntity { }
+export class VideoUnit extends Unit { }

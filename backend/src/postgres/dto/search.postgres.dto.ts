@@ -2,7 +2,7 @@ import { IsEnum, IsNotEmpty, IsString, Matches, ValidateByOptions, ValidationOpt
 
 const unitRegEx = "^[0-1]{64}$";
 
-export class SearchPostgreDto {
+export class SearchPostgresDto {
 
     @IsString()
     @IsNotEmpty()

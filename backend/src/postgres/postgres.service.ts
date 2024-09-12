@@ -1,26 +1,38 @@
 import { Injectable } from '@nestjs/common';
-import { SearchPostgreDto } from './dto/search.postgres.dto';
+import { SearchPostgresDto } from './dto/search.postgres.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Asset } from './entities/asset.entity';
+import { AudioUnit, ImageUnit, TextUnit, VideoUnit } from './entities/unit.entity';
 
 
 @Injectable()
 export class PostgresService {
-  create(createPostgreDto: SearchPostgreDto) {
-    return 'This action adds a new postgre';
+
+  constructor(
+    @InjectRepository(Asset) private readonly assetRepository: Repository<Asset>,
+    @InjectRepository(AudioUnit) private readonly audioUnitRepository: Repository<AudioUnit>,
+    @InjectRepository(ImageUnit) private readonly imageUnitRepository: Repository<ImageUnit>,
+    @InjectRepository(TextUnit) private readonly textUnitRepository: Repository<TextUnit>,
+    @InjectRepository(VideoUnit) private readonly videoUnitRepository: Repository<VideoUnit>
+  ) { }
+  create() {
+    return "";
   }
 
-  findAll() {
-    return `This action returns all postgres`;
+  drop() {
+    return "";
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} postgre`;
+  fill() {
+    return "";
   }
 
-  update(id: number, updatePostgreDto: SearchPostgreDto) {
-    return `This action updates a #${id} postgre`;
+  test(searchPostgreDto: SearchPostgresDto) {
+    return "";
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} postgre`;
+  info() {
+    return "";
   }
 }
