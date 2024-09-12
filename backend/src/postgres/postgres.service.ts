@@ -5,7 +5,6 @@ import { Repository } from 'typeorm';
 import { Asset } from './entities/asset.entity';
 import { AudioUnit, ImageUnit, TextUnit, VideoUnit } from './entities/unit.entity';
 
-
 @Injectable()
 export class PostgresService {
 
@@ -28,8 +27,8 @@ export class PostgresService {
     return "";
   }
 
-  test(searchPostgreDto: SearchPostgresDto) {
-    return "";
+  test(searchPostgreDto: SearchPostgresDto): SearchPostgresDto {
+    return searchPostgreDto;
   }
 
   info() {

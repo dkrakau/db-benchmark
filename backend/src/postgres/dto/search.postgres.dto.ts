@@ -1,14 +1,15 @@
-import { IsEnum, IsNotEmpty, IsString, Matches, ValidateByOptions, ValidationOptions } from "class-validator";
-
-const unitRegEx = "^[0-1]{64}$";
+import { ApiProperty } from "@nestjs/swagger";
+import { IsEnum, IsNotEmpty, IsString, Matches } from "class-validator";
 
 export class SearchPostgresDto {
 
+    @ApiProperty()
     @IsString()
     @IsNotEmpty()
-    @Matches(unitRegEx, "", { message: "Invalid unit format" })
+    @Matches("^[0-1]{64}$", "", { message: "Invalid unit format" })
     unit: string;
 
+    @ApiProperty()
     @IsString()
     @IsNotEmpty()
     @IsEnum(['audio', 'image', 'text', 'video'])

@@ -1,7 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { PostgresService } from './postgres.service';
 import { SearchPostgresDto } from './dto/search.postgres.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
+
+export enum Modes {
+  audio = 'audio',
+  image = 'image',
+  text = 'text',
+  video = 'video'
+}
 
 @ApiTags("PostgreSQL")
 @Controller('postgres')
@@ -24,9 +31,11 @@ export class PostgresController {
     return this.postgresService.fill();
   }
 
-  @Get("test")
-  testing(@Body() searchPostgresDto: SearchPostgresDto) {
-    return this.postgresService.test(searchPostgresDto);
+  @Get("/test")
+  @ApiQuery({ name: "unit", required: true, description: 'Binary iscc string', schema: { type: 'string' }, example: "0110011110101100001111100000111010011111011101001000000011110111" })
+  @ApiQuery({ name: 'mode', enum: Modes, required: true, description: 'Mode of unit', schema: { type: 'string' }, example: "image" })
+  test(@Query() searchPostgreDto: SearchPostgresDto): SearchPostgresDto {
+    return this.postgresService.test(searchPostgreDto);
   }
 
   @Get("info")
