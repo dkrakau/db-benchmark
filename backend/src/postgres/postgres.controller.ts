@@ -6,6 +6,7 @@ import { ApiTags } from '@nestjs/swagger';
 @ApiTags("PostgreSQL")
 @Controller('postgres')
 export class PostgresController {
+
   constructor(private readonly postgresService: PostgresService) { }
 
   @Get("create")
