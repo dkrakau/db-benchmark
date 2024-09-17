@@ -1,5 +1,6 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { ISCCGenerator } from "src/model/ISCCGenerator.model";
 import { Asset } from "./entities/asset.entity";
 import { AudioUnit, ImageUnit, TextUnit, VideoUnit } from "./entities/unit.entity";
 import { PostgresController } from "./postgres.controller";
@@ -16,6 +17,6 @@ import { PostgresService } from "./postgres.service";
     ])
   ],
   controllers: [PostgresController],
-  providers: [PostgresService],
+  providers: [PostgresService, ISCCGenerator],
 })
 export class PostgresModule { }

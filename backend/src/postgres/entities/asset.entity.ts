@@ -3,13 +3,13 @@ import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 @Entity()
 export class Asset {
 
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryGeneratedColumn({ type: 'bigint' })
+    id: string;
 
-    @Column()
+    @Column({ length: 60 })
     iscc: string;
 
     @Column()
-    metadata: number;
+    source: string;
 
 }

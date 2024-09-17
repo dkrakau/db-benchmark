@@ -1,5 +1,6 @@
 import { Controller, Get, Query } from "@nestjs/common";
 import { ApiOkResponse, ApiQuery, ApiTags } from "@nestjs/swagger";
+import { Unit } from "./entities/unit.entity";
 import { PostgresService } from "./postgres.service";
 import { TestRequestDto } from "./request-dto/test.request.dto";
 import { InfoResponseDto } from "./response-dto/info.response.dto";
@@ -32,7 +33,7 @@ export class PostgresController {
     type: TestResponseDto,
     isArray: false
   })
-  test(@Query() testRequestDto: TestRequestDto): TestResponseDto {
+  test(@Query() testRequestDto: TestRequestDto): Promise<Unit[]> {
     return this.postgresService.test(testRequestDto);
   }
 
