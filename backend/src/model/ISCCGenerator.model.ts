@@ -1,5 +1,12 @@
 import { Injectable } from "@nestjs/common";
 
+export enum Modes {
+    audio = "audio",
+    image = "image",
+    text = "text",
+    video = "video"
+}
+
 @Injectable()
 export class ISCCGenerator {
 
