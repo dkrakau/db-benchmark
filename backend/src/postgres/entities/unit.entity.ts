@@ -3,15 +3,26 @@ import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 @Entity()
 export abstract class Unit {
 
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryGeneratedColumn({ type: 'bigint' })
+    id: string;
 
-    @Column()
-    unit: string;
+    @Column({ type: 'bit', length: 64 })
+    meta: string;
 
-    @Column()
-    asset_id: number;
+    @Column({ type: 'bit', length: 64 })
+    content: string;
 
+    @Column({ type: 'bit', length: 64 })
+    data: string;
+
+    @Column({ type: 'bit', length: 64 })
+    instance: string;
+
+    @Column({ type: 'bigint' })
+    asset_id: string;
+
+    /* @Column()
+    hd?: number; */
 }
 
 @Entity()
