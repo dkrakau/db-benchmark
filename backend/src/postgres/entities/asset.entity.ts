@@ -12,4 +12,10 @@ export class Asset {
     @Column()
     source: string;
 
+    /* 
+    // bidirectional relation
+    @OneToOne(() => Unit, (unit) => unit.id)
+    unit: Unit
+    */
+
 }

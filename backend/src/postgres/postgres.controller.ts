@@ -1,6 +1,7 @@
 import { Controller, Get, Query } from "@nestjs/common";
 import { ApiOkResponse, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { Modes } from "src/model/ISCCGenerator.model";
+import { PostgresMessage } from "./entities/postgres.message.entity";
 import { Unit } from "./entities/unit.entity";
 import { PostgresService } from "./postgres.service";
 import { TestRequestDto } from "./request-dto/test.request.dto";
@@ -13,13 +14,18 @@ export class PostgresController {
 
   constructor(private readonly postgresService: PostgresService) { }
 
-  @Get("fill")
-  setup() {
-    return this.postgresService.fill();
+  @Get("/fill/samples")
+  fillSamples(): Promise<PostgresMessage> {
+    return this.postgresService.fillSamples();
+  }
+
+  @Get("/fill/random")
+  fillRandom(): Promise<PostgresMessage> {
+    return this.postgresService.fillRandom();
   }
 
   @Get("/test")
-  @ApiQuery({ name: "unit", required: true, description: "Binary iscc string", schema: { type: "string" }, example: "0110011110101100001111100000111010011111011101001000000011110111" })
+  @ApiQuery({ name: "unit", required: true, description: "Binary iscc string", schema: { type: "string" }, example: "1001011110100111011111111100011011000000100110000101011000010001" })
   @ApiQuery({ name: "mode", enum: Modes, required: true, description: "Mode of unit", schema: { type: "string" }, example: "image" })
   @ApiOkResponse({
     description: "Result",
@@ -30,7 +36,7 @@ export class PostgresController {
     return this.postgresService.test(testRequestDto);
   }
 
-  @Get("info")
+  @Get("/info")
   @ApiOkResponse({
     description: "Result",
     type: InfoResponseDto,
