@@ -36,7 +36,7 @@ export class PostgresService {
         iscc: data.iscc,
         source: data.source
       }
-      await this.assetRepository.save(asset);
+      await this.assetRepository.insert(asset);
 
       const contentUnit: ImageUnit = {
         id: "" + (new Date().getTime()),
@@ -46,7 +46,7 @@ export class PostgresService {
         instance: data.instance,
         asset: asset
       }
-      await this.imageUnitRepository.save(contentUnit);
+      await this.imageUnitRepository.insert(contentUnit);
     });
 
     const endTime = new Date().getTime();
@@ -65,7 +65,7 @@ export class PostgresService {
         iscc: this.isccGenerator.generateISCC(),
         source: ""
       }
-      await this.assetRepository.save(asset);
+      await this.assetRepository.insert(asset);
 
       const imageUnit: ImageUnit = {
         id: "" + (new Date().getTime()),
@@ -75,7 +75,7 @@ export class PostgresService {
         instance: this.isccGenerator.generateUNIT(),
         asset: asset
       }
-      await this.imageUnitRepository.save(imageUnit);
+      await this.imageUnitRepository.insert(imageUnit);
     }
 
     const endTime = new Date().getTime();
@@ -150,7 +150,7 @@ export class PostgresService {
 
     const infoResponseDto: InfoResponseDto = {
       asset_count: await this.assetRepository.count(),
-      audio_unit_count: await this.assetRepository.count(),
+      audio_unit_count: await this.audioUnitRepository.count(),
       image_unit_count: await this.imageUnitRepository.count(),
       text_unit_count: await this.textUnitRepository.count(),
       video_unit_count: await this.videoUnitRepository.count()
