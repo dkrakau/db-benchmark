@@ -1,6 +1,7 @@
 import { Controller, Get, Query } from "@nestjs/common";
 import { ApiOkResponse, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { Modes } from "src/model/ISCCGenerator.model";
+import { PostgresMessage } from "./entities/postgres.message.entity";
 import { Unit } from "./entities/unit.entity";
 import { PostgresService } from "./postgres.service";
 import { TestRequestDto } from "./request-dto/test.request.dto";
@@ -14,12 +15,12 @@ export class PostgresController {
   constructor(private readonly postgresService: PostgresService) { }
 
   @Get("/fill/samples")
-  fillSamples() {
+  fillSamples(): Promise<PostgresMessage> {
     return this.postgresService.fillSamples();
   }
 
   @Get("/fill/random")
-  fillRandom() {
+  fillRandom(): Promise<PostgresMessage> {
     return this.postgresService.fillRandom();
   }
 

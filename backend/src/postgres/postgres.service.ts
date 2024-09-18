@@ -1,9 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ISCCGenerator, Modes } from "src/model/ISCCGenerator.model";
+import { getFillDuration } from "src/model/time.model";
 import { Data, DataProvider } from "src/provider/data.provider";
 import { Repository } from "typeorm";
 import { Asset } from "./entities/asset.entity";
+import { PostgresMessage } from "./entities/postgres.message.entity";
 import { AudioUnit, ImageUnit, TextUnit, Unit, VideoUnit } from "./entities/unit.entity";
 import { TestRequestDto } from "./request-dto/test.request.dto";
 import { InfoResponseDto } from "./response-dto/info.response.dto";
@@ -21,7 +23,9 @@ export class PostgresService {
     @InjectRepository(VideoUnit) private readonly videoUnitRepository: Repository<VideoUnit>,
   ) { }
 
-  async fillSamples() {
+  async fillSamples(): Promise<PostgresMessage> {
+
+    const startTime = new Date().getTime();
 
     await this.dataProvider.load("./src/data/data-original.csv");
     const data: Data[] = this.dataProvider.get();
@@ -44,9 +48,16 @@ export class PostgresService {
       }
       await this.imageUnitRepository.save(contentUnit);
     });
+
+    const endTime = new Date().getTime();
+    const postgresMessage: PostgresMessage = { fill_duration: getFillDuration(startTime, endTime) }
+    return postgresMessage;
   }
 
-  async fillRandom() {
+  async fillRandom(): Promise<PostgresMessage> {
+
+    const startTime = new Date().getTime();
+
     for (let i = 0; i < 1000000000; i++) {
       const assetId: string = "" + new Date().getTime();
       const asset: Asset = {
@@ -66,6 +77,10 @@ export class PostgresService {
       }
       await this.imageUnitRepository.save(imageUnit);
     }
+
+    const endTime = new Date().getTime();
+    const postgresMessage: PostgresMessage = { fill_duration: getFillDuration(startTime, endTime) }
+    return postgresMessage;
   }
 
   async test(testRequestDto: TestRequestDto): Promise<Unit[]> {
