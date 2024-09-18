@@ -7,7 +7,16 @@ export abstract class Unit {
     id: string;
 
     @Column({ type: 'bit', length: 64 })
-    unit: string;
+    meta: string;
+
+    @Column({ type: 'bit', length: 64 })
+    content: string;
+
+    @Column({ type: 'bit', length: 64 })
+    data: string;
+
+    @Column({ type: 'bit', length: 64 })
+    instance: string;
 
     @Column({ type: 'bigint' })
     asset_id: string;

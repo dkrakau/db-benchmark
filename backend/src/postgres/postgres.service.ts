@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { ISCCGenerator } from "src/model/ISCCGenerator.model";
+import { ISCCGenerator, Modes } from "src/model/ISCCGenerator.model";
+import { Data, DataProvider } from "src/provider/data.provider";
 import { Repository } from "typeorm";
 import { Asset } from "./entities/asset.entity";
 import { AudioUnit, ImageUnit, TextUnit, Unit, VideoUnit } from "./entities/unit.entity";
-import { Modes } from "./postgres.controller";
 import { TestRequestDto } from "./request-dto/test.request.dto";
 import { InfoResponseDto } from "./response-dto/info.response.dto";
 
@@ -13,6 +13,7 @@ export class PostgresService {
 
   constructor(
     private readonly isccGenerator: ISCCGenerator,
+    private readonly dataProvider: DataProvider,
     @InjectRepository(Asset) private readonly assetRepository: Repository<Asset>,
     @InjectRepository(AudioUnit) private readonly audioUnitRepository: Repository<AudioUnit>,
     @InjectRepository(ImageUnit) private readonly imageUnitRepository: Repository<ImageUnit>,
@@ -22,6 +23,30 @@ export class PostgresService {
 
   async fill() {
 
+    await this.dataProvider.load("./src/data/data-original.csv");
+    const data: Data[] = this.dataProvider.get();
+
+    data.forEach(async (data) => {
+      const asset: Asset = {
+        id: "" + data.id,
+        iscc: data.iscc,
+        source: data.source
+      }
+      await this.assetRepository.save(asset);
+
+      const contentUnit: ImageUnit = {
+        id: "" + (new Date().getTime()),
+        meta: data.meta,
+        content: data.content,
+        data: data.data,
+        instance: data.instance,
+        asset_id: "" + data.id
+      }
+      await this.imageUnitRepository.save(contentUnit);
+    });
+  }
+
+  async fill2() {
     const assetId: string = "" + new Date().getTime();
     const asset: Asset = {
       id: assetId,
@@ -32,41 +57,46 @@ export class PostgresService {
 
     const audioUnit: AudioUnit = {
       id: "" + (new Date().getTime()),
-      unit: this.isccGenerator.generateUNIT(),
-      asset_id: assetId,
+      meta: this.isccGenerator.generateUNIT(),
+      content: this.isccGenerator.generateUNIT(),
+      data: this.isccGenerator.generateUNIT(),
+      instance: this.isccGenerator.generateUNIT(),
+      asset_id: assetId
     }
     await this.audioUnitRepository.save(audioUnit);
 
     const imageUnit: ImageUnit = {
       id: "" + (new Date().getTime()),
-      unit: this.isccGenerator.generateUNIT(),
-      asset_id: assetId,
+      meta: this.isccGenerator.generateUNIT(),
+      content: this.isccGenerator.generateUNIT(),
+      data: this.isccGenerator.generateUNIT(),
+      instance: this.isccGenerator.generateUNIT(),
+      asset_id: assetId
     }
     await this.imageUnitRepository.save(imageUnit);
 
     const textUnit: TextUnit = {
       id: "" + (new Date().getTime()),
-      unit: this.isccGenerator.generateUNIT(),
-      asset_id: assetId,
+      meta: this.isccGenerator.generateUNIT(),
+      content: this.isccGenerator.generateUNIT(),
+      data: this.isccGenerator.generateUNIT(),
+      instance: this.isccGenerator.generateUNIT(),
+      asset_id: assetId
     }
     await this.textUnitRepository.save(textUnit);
 
     const videoUnit: VideoUnit = {
       id: "" + (new Date().getTime()),
-      unit: this.isccGenerator.generateUNIT(),
-      asset_id: assetId,
+      meta: this.isccGenerator.generateUNIT(),
+      content: this.isccGenerator.generateUNIT(),
+      data: this.isccGenerator.generateUNIT(),
+      instance: this.isccGenerator.generateUNIT(),
+      asset_id: assetId
     }
     await this.videoUnitRepository.save(videoUnit);
-
-    return "";
   }
 
   async test(testRequestDto: TestRequestDto): Promise<Unit[]> {
-    /* let unitBin = this.isccGenerator.generateUNIT();
-    let unitDec1 = this.isccGenerator.getBigInt("0000000100000001000000010000000100000001000000010000000100000001");
-    let unitDec2 = this.isccGenerator.getBigInt("1111111111111111111111111111111111111111111111111111111111111111");
-    console.log(this.isccGenerator.getBitString(BigInt(-7160747828494289348)));
-    console.log(this.isccGenerator.getBitString(BigInt(-6250644909106607842))); */
 
     /* SELECT
     unit,
@@ -76,13 +106,13 @@ export class PostgresService {
     image_unit
     WHERE
     bit_count(unit # B'0000001110110111100011110100011001000100000010010111000110000110') > 16
-ORDER BY hd; */
+    ORDER BY hd; */
 
     let result: Unit[] = [];
 
-    let hammingDistance = 32;
-    let select: string = "unit, asset_id, bit_count(unit # B'" + testRequestDto.unit + "') as hd";
-    let where: string = "bit_count(unit # B'" + testRequestDto.unit + "') < " + hammingDistance;
+    let hammingDistance = 16;
+    let select: string = "id, meta, content, data, instance, asset_id, source, bit_count(content # B'" + testRequestDto.unit + "') as hd";
+    let where: string = "bit_count(content # B'" + testRequestDto.unit + "') < " + hammingDistance;
     let orderBy: string = "hd";
 
     if (testRequestDto.mode === Modes.audio) {
@@ -125,7 +155,7 @@ ORDER BY hd; */
 
     const infoResponseDto: InfoResponseDto = {
       asset_count: await this.assetRepository.count(),
-      audio_unit_count: await this.audioUnitRepository.count(),
+      audio_unit_count: await this.assetRepository.count(),
       image_unit_count: await this.imageUnitRepository.count(),
       text_unit_count: await this.textUnitRepository.count(),
       video_unit_count: await this.videoUnitRepository.count()

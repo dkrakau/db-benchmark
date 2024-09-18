@@ -1,18 +1,11 @@
 import { Controller, Get, Query } from "@nestjs/common";
 import { ApiOkResponse, ApiQuery, ApiTags } from "@nestjs/swagger";
+import { Modes } from "src/model/ISCCGenerator.model";
 import { Unit } from "./entities/unit.entity";
 import { PostgresService } from "./postgres.service";
 import { TestRequestDto } from "./request-dto/test.request.dto";
 import { InfoResponseDto } from "./response-dto/info.response.dto";
 import { TestResponseDto } from "./response-dto/test.response.dto";
-
-
-export enum Modes {
-  audio = "audio",
-  image = "image",
-  text = "text",
-  video = "video"
-}
 
 @ApiTags("PostgreSQL")
 @Controller("postgres")
