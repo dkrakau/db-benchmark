@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { MilvusProvider } from '../provider/milvus.provider';
-import { BinaryVector, ConsistencyLevelEnum, CreateIndexParam, CreateIndexSimpleReq, DataType, DescribeCollectionResponse, FieldType, FlushResult, GetLoadStateResponse, GetVersionResponse, MetricType, ResStatus, SearchParam, SearchReq, SearchResults, SearchSimpleReq, ShowCollectionsResponse, ShowPartitionsResponse, VectorTypes } from '@zilliz/milvus2-sdk-node';
+import { BinaryVector, ConsistencyLevelEnum, CreateIndexSimpleReq, DataType, FieldType, FlushResult, MetricType, SearchParam, SearchReq, SearchResults } from '@zilliz/milvus2-sdk-node';
 import { ISCCGenerator } from 'src/model/ISCCGenerator.model';
+import { getFillDuration } from "src/model/time.model";
+import { MilvusProvider } from '../provider/milvus.provider';
 import { MilvusMessage } from './entities/message.milvus.entity';
 
 
@@ -97,14 +98,8 @@ export class MilvusService {
 
     const endTime = new Date().getTime();
 
-    const milvusMessage: MilvusMessage = { fill_duration: this.getFillDuration(startTime, endTime) }
+    const milvusMessage: MilvusMessage = { fill_duration: getFillDuration(startTime, endTime) }
     return milvusMessage;
-  }
-
-  private getFillDuration(startTime: number, endTime: number): string {
-    let milliseconds: number = endTime - startTime;
-    let seconds: number = Math.floor(milliseconds / 1000);
-    return Math.floor(seconds / 3600) + ":" + Math.floor(seconds / 60 % 60) + ":" + (seconds % 60)
   }
 
   private async unitToBinaryVector(unit: string): Promise<BinaryVector> {
