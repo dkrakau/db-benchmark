@@ -21,7 +21,7 @@ export class PostgresService {
     @InjectRepository(VideoUnit) private readonly videoUnitRepository: Repository<VideoUnit>,
   ) { }
 
-  async fill() {
+  async fillSamples() {
 
     await this.dataProvider.load("./src/data/data-original.csv");
     const data: Data[] = this.dataProvider.get();
@@ -40,60 +40,32 @@ export class PostgresService {
         content: data.content,
         data: data.data,
         instance: data.instance,
-        asset_id: "" + data.id
+        asset: asset
       }
       await this.imageUnitRepository.save(contentUnit);
     });
   }
 
-  async fill2() {
-    const assetId: string = "" + new Date().getTime();
-    const asset: Asset = {
-      id: assetId,
-      iscc: this.isccGenerator.generateISCC(),
-      source: ""
-    }
-    await this.assetRepository.save(asset);
+  async fillRandom() {
+    for (let i = 0; i < 1000000000; i++) {
+      const assetId: string = "" + new Date().getTime();
+      const asset: Asset = {
+        id: assetId,
+        iscc: this.isccGenerator.generateISCC(),
+        source: ""
+      }
+      await this.assetRepository.save(asset);
 
-    const audioUnit: AudioUnit = {
-      id: "" + (new Date().getTime()),
-      meta: this.isccGenerator.generateUNIT(),
-      content: this.isccGenerator.generateUNIT(),
-      data: this.isccGenerator.generateUNIT(),
-      instance: this.isccGenerator.generateUNIT(),
-      asset_id: assetId
+      const imageUnit: ImageUnit = {
+        id: "" + (new Date().getTime()),
+        meta: this.isccGenerator.generateUNIT(),
+        content: this.isccGenerator.generateUNIT(),
+        data: this.isccGenerator.generateUNIT(),
+        instance: this.isccGenerator.generateUNIT(),
+        asset: asset
+      }
+      await this.imageUnitRepository.save(imageUnit);
     }
-    await this.audioUnitRepository.save(audioUnit);
-
-    const imageUnit: ImageUnit = {
-      id: "" + (new Date().getTime()),
-      meta: this.isccGenerator.generateUNIT(),
-      content: this.isccGenerator.generateUNIT(),
-      data: this.isccGenerator.generateUNIT(),
-      instance: this.isccGenerator.generateUNIT(),
-      asset_id: assetId
-    }
-    await this.imageUnitRepository.save(imageUnit);
-
-    const textUnit: TextUnit = {
-      id: "" + (new Date().getTime()),
-      meta: this.isccGenerator.generateUNIT(),
-      content: this.isccGenerator.generateUNIT(),
-      data: this.isccGenerator.generateUNIT(),
-      instance: this.isccGenerator.generateUNIT(),
-      asset_id: assetId
-    }
-    await this.textUnitRepository.save(textUnit);
-
-    const videoUnit: VideoUnit = {
-      id: "" + (new Date().getTime()),
-      meta: this.isccGenerator.generateUNIT(),
-      content: this.isccGenerator.generateUNIT(),
-      data: this.isccGenerator.generateUNIT(),
-      instance: this.isccGenerator.generateUNIT(),
-      asset_id: assetId
-    }
-    await this.videoUnitRepository.save(videoUnit);
   }
 
   async test(testRequestDto: TestRequestDto): Promise<Unit[]> {
@@ -110,44 +82,52 @@ export class PostgresService {
 
     let result: Unit[] = [];
 
+    let topK = 10;
     let hammingDistance = 16;
-    let select: string = "id, meta, content, data, instance, asset_id, source, bit_count(content # B'" + testRequestDto.unit + "') as hd";
+    let select: string = "query_" + testRequestDto.mode + "_unit.id, meta, content, data, instance, asset.source, bit_count(content # B'" + testRequestDto.unit + "') as hd";
     let where: string = "bit_count(content # B'" + testRequestDto.unit + "') < " + hammingDistance;
     let orderBy: string = "hd";
 
     if (testRequestDto.mode === Modes.audio) {
       result = await this.audioUnitRepository
         .createQueryBuilder("query_audio_unit")
+        .leftJoinAndSelect("query_audio_unit.asset", "asset")
         .select(select)
         .where(where)
         .orderBy(orderBy)
-        .execute();
+        .limit(topK)
+        .getRawMany();
     }
     if (testRequestDto.mode === Modes.image) {
       result = await this.imageUnitRepository
         .createQueryBuilder("query_image_unit")
+        .leftJoinAndSelect("query_image_unit.asset", "asset")
         .select(select)
         .where(where)
         .orderBy(orderBy)
-        .execute();
+        .limit(topK)
+        .getRawMany();
     }
     if (testRequestDto.mode === Modes.text) {
       result = await this.textUnitRepository
         .createQueryBuilder("query_text_unit")
+        .leftJoinAndSelect("query_text_unit.asset", "asset")
         .select(select)
         .where(where)
         .orderBy(orderBy)
-        .execute();
+        .limit(topK)
+        .getRawMany();
     }
     if (testRequestDto.mode === Modes.video) {
       result = await this.videoUnitRepository
         .createQueryBuilder("query_video_unit")
+        .leftJoinAndSelect("query_video_unit.asset", "asset")
         .select(select)
         .where(where)
         .orderBy(orderBy)
-        .execute();
+        .limit(topK)
+        .getRawMany();
     }
-
     return result;
   }
 

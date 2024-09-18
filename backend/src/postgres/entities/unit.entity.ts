@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Asset } from "./asset.entity";
 
 @Entity()
 export abstract class Unit {
@@ -18,11 +19,15 @@ export abstract class Unit {
     @Column({ type: 'bit', length: 64 })
     instance: string;
 
+    /* 
     @Column({ type: 'bigint' })
-    asset_id: string;
+    assetId: string;
+    */
 
-    /* @Column()
-    hd?: number; */
+    @OneToOne(() => Asset, (asset) => asset.id)
+    @JoinColumn()
+    asset: Asset;
+
 }
 
 @Entity()
