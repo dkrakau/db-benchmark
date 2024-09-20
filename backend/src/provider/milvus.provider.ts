@@ -3,10 +3,13 @@ import {
     BoolResponse, CreateIndexSimpleReq,
     DataType,
     DeleteReq,
+    DescribeCollectionReq,
     DescribeCollectionResponse,
+    DropCollectionReq,
     FieldType,
     FlushReq,
     FlushResult,
+    GetLoadingProgressReq,
     GetLoadStateResponse,
     GetVersionResponse,
     HybridSearchReq,
@@ -22,6 +25,7 @@ import {
     SearchResults,
     SearchSimpleReq,
     ShowCollectionsResponse,
+    ShowPartitionsReq,
     ShowPartitionsResponse,
     VectorTypes
 } from "@zilliz/milvus2-sdk-node";
@@ -33,6 +37,13 @@ export interface NNSParams {
     searchParams: SearchParam,
     outputFields: string[],
     partitionNames?: string[]
+}
+
+export enum MilvusResponse {
+    success = "Success",
+    unexpectedError = "UnexpectedError",
+    loadStateNotExist = "LoadStateNotExist",
+    collectionNotExists = "CollectionNotExists"
 }
 
 @Injectable()
@@ -103,6 +114,10 @@ export class MilvusProvider {
         return response;
     }
 
+    public async createDatabase(databaseName: string): Promise<ResStatus> {
+        return await this.client.createDatabase({ db_name: databaseName });
+    }
+
     public async createCollection(
         collectionName: string,
         description: string,
@@ -127,11 +142,12 @@ export class MilvusProvider {
         return response;
     }
 
-    public async dropCollection(collectionName: string): Promise<ResStatus> {
-        const response: ResStatus = await this.client.dropCollection({
-            collection_name: collectionName
-        });
-        return response;
+    public async dropDatabase(databaseName: string): Promise<ResStatus> {
+        return await this.client.dropDatabase({ db_name: databaseName });
+    }
+
+    public async dropCollection(dropCollectionReq: DropCollectionReq): Promise<ResStatus> {
+        return await this.client.dropCollection(dropCollectionReq);
     }
 
     public async createPartition(collectionName: string, partitionName: string): Promise<ResStatus> {
@@ -148,6 +164,10 @@ export class MilvusProvider {
             partition_name: partitionName
         });
         return response;
+    }
+
+    public async useDatabase(databaseName: string) {
+        return await this.client.useDatabase({ db_name: databaseName });
     }
 
     public async loadCollection(collectionName: string): Promise<ResStatus> {
@@ -171,11 +191,8 @@ export class MilvusProvider {
         return response;
     }
 
-    public async getLoadState(collectionName: string): Promise<GetLoadStateResponse> {
-        const response: GetLoadStateResponse = await this.client.getLoadState({
-            collection_name: collectionName
-        });
-        return response;
+    public async getLoadState(getLoadingProgressReq: GetLoadingProgressReq): Promise<GetLoadStateResponse> {
+        return await this.client.getLoadState(getLoadingProgressReq);
     }
 
     public async loadPartition(collectionName: string, partitionNames: string[]): Promise<ResStatus> {
@@ -206,17 +223,12 @@ export class MilvusProvider {
         return await this.client.listCollections();
     }
 
-    public async describeColleciton(collectionName: string): Promise<DescribeCollectionResponse> {
-        const response: DescribeCollectionResponse = await this.client.describeCollection({
-            collection_name: collectionName
-        });
-        return response;
+    public async describeColleciton(describeCollectionReq: DescribeCollectionReq): Promise<DescribeCollectionResponse> {
+        return await this.client.describeCollection(describeCollectionReq);
     }
 
-    public async listPartitionsInCollection(collectionName: string): Promise<ShowPartitionsResponse> {
-        const response: ShowPartitionsResponse = await this.client.listPartitions({
-            collection_name: collectionName
-        })
+    public async listPartitionsInCollection(showPartitionsReq: ShowPartitionsReq): Promise<ShowPartitionsResponse> {
+        const response: ShowPartitionsResponse = await this.client.listPartitions(showPartitionsReq)
         return response;
     }
 
