@@ -1,19 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
+import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { Modes } from "src/model/ISCCGenerator.model";
+import { TestRequestDto } from "./dto/test.request.dts";
 import { MilvusService } from './milvus.service';
-import { ApiParam, ApiTags } from '@nestjs/swagger';
-
-export enum Modes {
-  audio = 'audio',
-  image = 'image',
-  text = 'text',
-  video = 'video'
-}
 
 @ApiTags('Milvus')
 @Controller('milvus')
 export class MilvusController {
-  
-  constructor(private readonly milvusService: MilvusService) {}
+
+  constructor(private readonly milvusService: MilvusService) { }
 
   @Get('create')
   create() {
@@ -25,17 +20,26 @@ export class MilvusController {
     return this.milvusService.drop();
   }
 
-  @Get('fill')
-  setup() {
-    return this.milvusService.fill();
+  @Get('/fill/samples')
+  fillSamples() {
+    return this.milvusService.fillSamples();
   }
 
-  @Get('/test/:unit/:mode')
-  @ApiParam({name: 'unit', required: true, description: 'Binary iscc string', schema: { type: 'string'}, example: "0110011110101100001111100000111010011111011101001000000011110111"})
-  @ApiParam({name: 'mode', required: true, description: 'Mode of unit', schema: { type: 'string'}, example: "image"})
-  test(@Param('unit') unit: string, @Param('mode') mode: string) {
-    return this.milvusService.test(unit, mode);
-  } 
+  @Get('/fill/random')
+  fillRandom() {
+    return this.milvusService.fillRandom();
+  }
+
+  @Get('/test')
+  @ApiQuery({ name: "unit", required: true, description: "Binary iscc string", schema: { type: "string" }, example: "1001011110100111011111111100011011000000100110000101011000010001" })
+  @ApiQuery({ name: "mode", enum: Modes, required: true, description: "Mode of unit", schema: { type: "string" }, example: "image" })
+  @ApiOkResponse({
+    description: "Result",
+    isArray: true
+  })
+  test(@Query() testRequestDto: TestRequestDto) {
+    return this.milvusService.test(testRequestDto);
+  }
 
   @Get('info')
   info() {
