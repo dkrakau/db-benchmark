@@ -6,7 +6,7 @@ import { Data, DataProvider } from "src/provider/data.provider";
 import { Repository } from "typeorm";
 import { Asset } from "./entities/asset.entity";
 import { PostgresMessage } from "./entities/postgres.message.entity";
-import { AudioUnit, ImageUnit, TextUnit, Unit, VideoUnit } from "./entities/unit.entity";
+import { Audio, Image, Text, Unit, Video } from "./entities/unit.entity";
 import { TestRequestDto } from "./request-dto/test.request.dto";
 import { InfoResponseDto } from "./response-dto/info.response.dto";
 
@@ -17,10 +17,10 @@ export class PostgresService {
     private readonly isccGenerator: ISCCGenerator,
     private readonly dataProvider: DataProvider,
     @InjectRepository(Asset) private readonly assetRepository: Repository<Asset>,
-    @InjectRepository(AudioUnit) private readonly audioUnitRepository: Repository<AudioUnit>,
-    @InjectRepository(ImageUnit) private readonly imageUnitRepository: Repository<ImageUnit>,
-    @InjectRepository(TextUnit) private readonly textUnitRepository: Repository<TextUnit>,
-    @InjectRepository(VideoUnit) private readonly videoUnitRepository: Repository<VideoUnit>,
+    @InjectRepository(Audio) private readonly audioRepository: Repository<Audio>,
+    @InjectRepository(Image) private readonly imageRepository: Repository<Image>,
+    @InjectRepository(Text) private readonly textRepository: Repository<Text>,
+    @InjectRepository(Video) private readonly videoRepository: Repository<Video>,
   ) { }
 
   async fillSamples(): Promise<PostgresMessage> {
@@ -38,7 +38,7 @@ export class PostgresService {
       }
       await this.assetRepository.insert(asset);
 
-      const contentUnit: ImageUnit = {
+      const content: Image = {
         id: "" + (new Date().getTime()),
         meta: data.meta,
         content: data.content,
@@ -46,7 +46,7 @@ export class PostgresService {
         instance: data.instance,
         asset: asset
       }
-      await this.imageUnitRepository.insert(contentUnit);
+      await this.imageRepository.insert(content);
     });
 
     const endTime = new Date().getTime();
@@ -67,7 +67,7 @@ export class PostgresService {
       }
       await this.assetRepository.insert(asset);
 
-      const imageUnit: ImageUnit = {
+      const image: Image = {
         id: "" + (new Date().getTime()),
         meta: this.isccGenerator.generateUNIT(),
         content: this.isccGenerator.generateUNIT(),
@@ -75,7 +75,7 @@ export class PostgresService {
         instance: this.isccGenerator.generateUNIT(),
         asset: asset
       }
-      await this.imageUnitRepository.insert(imageUnit);
+      await this.imageRepository.insert(image);
     }
 
     const endTime = new Date().getTime();
@@ -92,21 +92,23 @@ export class PostgresService {
     FROM
     image_unit
     WHERE
-    bit_count(unit # B'0000001110110111100011110100011001000100000010010111000110000110') > 16
+    bit_count(unit # B'0000001110110111100011110100011001000100000010010111000110000110') < 16
     ORDER BY hd; */
 
     let result: Unit[] = [];
 
-    let topK = 10;
+    let topK = 100;
     let hammingDistance = 16;
-    let select: string = "query_" + testRequestDto.mode + "_unit.id, meta, content, data, instance, asset.source, bit_count(content # B'" + testRequestDto.unit + "') as hd";
+    let select: string = "query_" + testRequestDto.mode + ".id, meta, content, data, instance, asset.source, bit_count(content # B'" + testRequestDto.unit + "') as hd";
     let where: string = "bit_count(content # B'" + testRequestDto.unit + "') < " + hammingDistance;
     let orderBy: string = "hd";
 
+    const startTime = new Date().getTime();
+
     if (testRequestDto.mode === Modes.audio) {
-      result = await this.audioUnitRepository
-        .createQueryBuilder("query_audio_unit")
-        .leftJoinAndSelect("query_audio_unit.asset", "asset")
+      result = await this.audioRepository
+        .createQueryBuilder("query_audio")
+        .leftJoinAndSelect("query_audio.asset", "asset")
         .select(select)
         .where(where)
         .orderBy(orderBy)
@@ -114,9 +116,9 @@ export class PostgresService {
         .getRawMany();
     }
     if (testRequestDto.mode === Modes.image) {
-      result = await this.imageUnitRepository
-        .createQueryBuilder("query_image_unit")
-        .leftJoinAndSelect("query_image_unit.asset", "asset")
+      result = await this.imageRepository
+        .createQueryBuilder("query_image")
+        .leftJoinAndSelect("query_image.asset", "asset")
         .select(select)
         .where(where)
         .orderBy(orderBy)
@@ -124,9 +126,9 @@ export class PostgresService {
         .getRawMany();
     }
     if (testRequestDto.mode === Modes.text) {
-      result = await this.textUnitRepository
-        .createQueryBuilder("query_text_unit")
-        .leftJoinAndSelect("query_text_unit.asset", "asset")
+      result = await this.textRepository
+        .createQueryBuilder("query_text")
+        .leftJoinAndSelect("query_text.asset", "asset")
         .select(select)
         .where(where)
         .orderBy(orderBy)
@@ -134,15 +136,21 @@ export class PostgresService {
         .getRawMany();
     }
     if (testRequestDto.mode === Modes.video) {
-      result = await this.videoUnitRepository
-        .createQueryBuilder("query_video_unit")
-        .leftJoinAndSelect("query_video_unit.asset", "asset")
+      result = await this.videoRepository
+        .createQueryBuilder("query_video")
+        .leftJoinAndSelect("query_video.asset", "asset")
         .select(select)
         .where(where)
         .orderBy(orderBy)
         .limit(topK)
         .getRawMany();
     }
+
+    const endTime = new Date().getTime();
+    const postgresMessage: PostgresMessage = { fill_duration: getFillDuration(startTime, endTime) }
+
+    console.log(postgresMessage);
+
     return result;
   }
 
@@ -150,10 +158,10 @@ export class PostgresService {
 
     const infoResponseDto: InfoResponseDto = {
       asset_count: await this.assetRepository.count(),
-      audio_unit_count: await this.audioUnitRepository.count(),
-      image_unit_count: await this.imageUnitRepository.count(),
-      text_unit_count: await this.textUnitRepository.count(),
-      video_unit_count: await this.videoUnitRepository.count()
+      audio_count: await this.audioRepository.count(),
+      image_count: await this.imageRepository.count(),
+      text_count: await this.textRepository.count(),
+      video_count: await this.videoRepository.count()
     }
 
     return infoResponseDto;

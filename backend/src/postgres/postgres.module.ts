@@ -4,7 +4,7 @@ import { CsvParser } from "nest-csv-parser";
 import { ISCCGenerator } from "src/model/ISCCGenerator.model";
 import { DataProvider } from "src/provider/data.provider";
 import { Asset } from "./entities/asset.entity";
-import { AudioUnit, ImageUnit, TextUnit, VideoUnit } from "./entities/unit.entity";
+import { Audio, Image, Text, Video } from "./entities/unit.entity";
 import { PostgresController } from "./postgres.controller";
 import { PostgresService } from "./postgres.service";
 
@@ -12,10 +12,10 @@ import { PostgresService } from "./postgres.service";
   imports: [
     TypeOrmModule.forFeature([
       Asset,
-      AudioUnit,
-      ImageUnit,
-      TextUnit,
-      VideoUnit
+      Audio,
+      Image,
+      Text,
+      Video
     ])
   ],
   controllers: [PostgresController],
