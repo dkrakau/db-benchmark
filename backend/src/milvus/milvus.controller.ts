@@ -41,6 +41,11 @@ export class MilvusController {
     return this.milvusService.test(testRequestDto);
   }
 
+  @Get('/list/import/jobs')
+  listImportJobs() {
+    return this.milvusService.listImportJobs();
+  }
+
   @Get('info')
   info() {
     return this.milvusService.info();
