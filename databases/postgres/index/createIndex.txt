@@ -1,0 +1,5 @@
+https://www.postgresql.org/docs/current/indexes-types.html
+https://www.postgresql.org/docs/current/btree-gist.html
+create extension btree_gist;
+CREATE INDEX index_content_gist ON image_unit USING GIST (content);
+CREATE INDEX index_content_spgist ON image_unit USING SPGIST (content);
