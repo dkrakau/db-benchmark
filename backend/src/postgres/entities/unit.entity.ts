@@ -19,25 +19,25 @@ export abstract class Unit {
     @Column({ type: 'bit', length: 64 })
     instance: string;
 
+    @OneToOne(() => Asset, (asset) => asset.id)
+    @JoinColumn()
+    asset: Asset;
+
     /* 
     @Column({ type: 'bigint' })
     assetId: string;
     */
 
-    @OneToOne(() => Asset, (asset) => asset.id)
-    @JoinColumn()
-    asset: Asset;
-
 }
 
 @Entity()
-export class AudioUnit extends Unit { }
+export class Audio extends Unit { }
 
 @Entity()
-export class ImageUnit extends Unit { }
+export class Image extends Unit { }
 
 @Entity()
-export class TextUnit extends Unit { }
+export class Text extends Unit { }
 
 @Entity()
-export class VideoUnit extends Unit { }
+export class Video extends Unit { }

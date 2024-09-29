@@ -1,0 +1,1 @@
+./milvus-backup create -n milvus-iscc-backup -d iscc

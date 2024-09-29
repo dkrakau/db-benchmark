@@ -252,7 +252,7 @@ export class MilvusService {
 
     const searchParam: SearchParam = {
       anns_field: "vector",
-      topk: 50,
+      topk: 100,
       metric_type: MetricType.HAMMING,
       params: JSON.stringify({ nprobe: 128 })
     };
@@ -268,9 +268,25 @@ export class MilvusService {
     }
 
     let response: SearchResults = await this.milvusProvider.nns(searchReq);
-    console.log({ id: response.results[0].id, unit: await this.binaryVectorToUnit(response.results[0]["vector"]), distance: response.results[0].score });
+    //console.log({ id: response.results[0].id, unit: await this.binaryVectorToUnit(response.results[0]["vector"]), distance: response.results[0].score });
 
     return response;
+  }
+
+  public async listImportJobs() {
+    let post = {
+      method: "POST",
+      body: JSON.stringify({
+        dbName: "iscc",
+        collectionName: "image",
+        partitionName: "content"
+      }),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8"
+      }
+    };
+    let response = await fetch("http://localhost:19530/v2/vectordb/jobs/import/list", post).then(response => response.json());
+    return response.data.records;
   }
 
   public async info(): Promise<any[]> {

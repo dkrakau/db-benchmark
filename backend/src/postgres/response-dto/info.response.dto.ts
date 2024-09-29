@@ -11,21 +11,21 @@ export class InfoResponseDto {
     @ApiProperty()
     @IsNumber()
     @IsNotEmpty()
-    audio_unit_count: number;
+    audio_count: number;
 
     @ApiProperty()
     @IsNumber()
     @IsNotEmpty()
-    image_unit_count: number;
+    image_count: number;
 
     @ApiProperty()
     @IsNumber()
     @IsNotEmpty()
-    text_unit_count: number;
+    text_count: number;
 
     @ApiProperty()
     @IsNumber()
     @IsNotEmpty()
-    video_unit_count: number;
+    video_count: number;
 
 }
