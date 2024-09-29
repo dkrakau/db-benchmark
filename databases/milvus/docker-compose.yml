@@ -51,6 +51,24 @@ services:
       - "etcd"
       - "minio"
 
+  backup:
+    container_name: milvus-backup
+    image: milvusdb/milvus-backup
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/backup:/app/backup
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/backup.yaml:/app/configs/backup.yaml
+    ports:
+     - "8888:8888"
+    networks:
+      - seminar
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - "etcd"
+      - "minio"
+      - "standalone"
+    command: ./milvus-backup server -p 8888
+
   attu:
     container_name: milvus-attu
     image: zilliz/attu:v2.4.8
