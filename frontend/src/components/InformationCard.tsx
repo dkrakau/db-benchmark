@@ -9,7 +9,7 @@ interface InformationCardProps {
 
 const InformationCard: React.FC<InformationCardProps> = (props) => {
     return (
-        <IonCard className={styles.informationCard}>
+        <IonCard className={styles.contentinformationCard}>
             <IonCardHeader>
                 <IonCardTitle className={styles.title}>
                     {props.title}

@@ -7,3 +7,5 @@ docs/
 *.bat
 *.cmd
 *.btm
+
+databases/postgres/data/
