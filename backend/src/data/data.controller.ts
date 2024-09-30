@@ -1,34 +1,45 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { DataService } from './data.service';
-import { CreateDatumDto } from './dto/create-datum.dto';
-import { UpdateDatumDto } from './dto/update-datum.dto';
+import { Body, Controller, Get, Post, Query } from "@nestjs/common";
+import { ApiOkResponse, ApiQuery, ApiTags } from "@nestjs/swagger";
+import { DataService } from "./data.service";
+import { DataListDto } from "./dto/data-list.dto";
+import { DataLoadDto } from "./dto/data-load.dto";
+import { DataSaveDto } from "./dto/data-save.dto";
 
-@Controller('data')
+
+@ApiTags("Data")
+@Controller("data")
 export class DataController {
-  constructor(private readonly dataService: DataService) {}
 
-  @Post()
-  create(@Body() createDatumDto: CreateDatumDto) {
-    return this.dataService.create(createDatumDto);
+  constructor(private readonly dataService: DataService) { }
+
+  @Get("/list")
+  @ApiQuery({ name: "db", required: true, description: "Database name", schema: { type: "string" }, example: "milvus" })
+  @ApiOkResponse({
+    description: "Result",
+    isArray: false
+  })
+  list(@Query() dataListDto: DataListDto): string[] {
+    return this.dataService.list(dataListDto);
   }
 
-  @Get()
-  findAll() {
-    return this.dataService.findAll();
+  @Get("/load")
+  @ApiQuery({ name: "db", required: true, description: "Database name", schema: { type: "string" }, example: "milvus" })
+  @ApiQuery({ name: "file", required: true, description: "File name", schema: { type: "string" }, example: "filename.json" })
+  @ApiOkResponse({
+    description: "Result",
+    isArray: false
+  })
+  load(@Query() dataLoadDto: DataLoadDto) {
+    return this.dataService.load(dataLoadDto);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.dataService.findOne(+id);
+  @Post("/save")
+  @ApiOkResponse({
+    description: "Result",
+    isArray: false
+  })
+  save(@Body() dataSaveDto: DataSaveDto) {
+    return this.dataService.save(dataSaveDto);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDatumDto: UpdateDatumDto) {
-    return this.dataService.update(+id, updateDatumDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.dataService.remove(+id);
-  }
 }
