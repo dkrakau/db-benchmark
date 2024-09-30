@@ -5,7 +5,7 @@ import { ISCCGenerator, Modes } from "src/model/ISCCGenerator.model";
 import { getFillDuration } from "src/model/time.model";
 import { Asset } from "src/postgres/entities/asset.entity";
 import { PostgresMessage } from "src/postgres/entities/postgres.message.entity";
-import { Audio, Image, Text, Unit, Video } from "src/postgres/entities/unit.entity";
+import { Audio, Image, Text, Video } from "src/postgres/entities/unit.entity";
 import { DataProvider } from "src/provider/data.provider";
 import { MilvusProvider } from "src/provider/milvus.provider";
 import { Repository } from "typeorm";
@@ -69,43 +69,33 @@ export class SearchService {
     response.results.forEach(result => (
       testResult.results.push({
         score: result.score,
-        unit: this.milvusProvider.binaryVectorToUnit(result.vector),
+        //unit: this.milvusProvider.binaryVectorToUnit(result.vector),
         asset_id: result.asset_id,
-        source: "-"
+        //source: "-"
       })
     ));
 
     return testResult;
   }
 
-  async postgresTest(testRequestDto: TestRequestDto): Promise<Unit[]> {
-
-    /* SELECT
-    unit,
-      asset_id,
-      bit_count(unit # B'0000001110110111100011110100011001000100000010010111000110000110') as hd
-    FROM
-    image_unit
-    WHERE
-    bit_count(unit # B'0000001110110111100011110100011001000100000010010111000110000110') < 16
-    ORDER BY hd; */
-
-    let result: Unit[] = [];
-
-    let topK = 100;
-    let hammingDistance = 16;
-    let select: string = "query_" + testRequestDto.mode + ".id, meta, content, data, instance, asset.source, bit_count(content # B'" + testRequestDto.unit + "') as hd";
-    let where: string = "bit_count(content # B'" + testRequestDto.unit + "') < " + hammingDistance;
-    let orderBy: string = "hd";
+  async postgresTest(testRequestDto: TestRequestDto): Promise<TestResponseDto> {
 
     const startTime = new Date().getTime();
+
+    let result = [];
+
+    let topK = 100;
+    let hammingDistance = 64;
+    let select: string = "query_" + testRequestDto.mode + ".id, meta, content, data, instance, asset.source, bit_count(content # B'" + testRequestDto.unit + "') as score";
+    //let where: string = "bit_count(content # B'" + testRequestDto.unit + "') < " + hammingDistance;
+    let orderBy: string = "score";
 
     if (testRequestDto.mode === Modes.audio) {
       result = await this.audioRepository
         .createQueryBuilder("query_audio")
         .leftJoinAndSelect("query_audio.asset", "asset")
         .select(select)
-        .where(where)
+        //.where(where)
         .orderBy(orderBy)
         .limit(topK)
         .getRawMany();
@@ -115,7 +105,7 @@ export class SearchService {
         .createQueryBuilder("query_image")
         .leftJoinAndSelect("query_image.asset", "asset")
         .select(select)
-        .where(where)
+        //.where(where)
         .orderBy(orderBy)
         .limit(topK)
         .getRawMany();
@@ -125,7 +115,7 @@ export class SearchService {
         .createQueryBuilder("query_text")
         .leftJoinAndSelect("query_text.asset", "asset")
         .select(select)
-        .where(where)
+        //.where(where)
         .orderBy(orderBy)
         .limit(topK)
         .getRawMany();
@@ -135,17 +125,28 @@ export class SearchService {
         .createQueryBuilder("query_video")
         .leftJoinAndSelect("query_video.asset", "asset")
         .select(select)
-        .where(where)
+        //.where(where)
         .orderBy(orderBy)
         .limit(topK)
         .getRawMany();
     }
 
     const endTime = new Date().getTime();
+    const time = endTime - startTime;
+
+    const testResult: TestResponseDto = { milliseconds: time, results: [] };
+
+    result.forEach(unit => (
+      testResult.results.push({
+        score: parseInt(unit.score),
+        //unit: unit.content,
+        asset_id: unit.id,
+        //source: unit.source
+      })
+    ));
+
     const postgresMessage: PostgresMessage = { fill_duration: getFillDuration(startTime, endTime) }
 
-    console.log(postgresMessage);
-
-    return result;
+    return testResult;
   }
 }

@@ -1,7 +1,6 @@
 import { Controller, Get, Query } from "@nestjs/common";
 import { ApiOkResponse, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { Modes } from "src/model/ISCCGenerator.model";
-import { Unit } from "src/postgres/entities/unit.entity";
 import { TestRequestDto } from "./dto/test.request.dto";
 import { TestResponseDto } from "./dto/test.response.dto";
 import { SearchService } from "./search.service";
@@ -31,7 +30,7 @@ export class SearchController {
     description: "Result",
     isArray: false
   })
-  postgresTest(@Query() testRequestDto: TestRequestDto): Promise<Unit[]> {
+  postgresTest(@Query() testRequestDto: TestRequestDto): Promise<TestResponseDto> {
     return this.searchService.postgresTest(testRequestDto);
   }
 
