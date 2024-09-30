@@ -7,7 +7,7 @@ services:
       - ETCD_AUTO_COMPACTION_RETENTION=1000
       - ETCD_QUOTA_BACKEND_BYTES=4294967296
     networks:
-      - seminar
+      - benchmark
     volumes:
       - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/etcd:/etcd
     command: etcd -advertise-client-urls=http://127.0.0.1:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
@@ -24,7 +24,7 @@ services:
       - "9000:9000"
       - "9001:9001"
     networks:
-      - seminar
+      - benchmark
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s
@@ -44,7 +44,7 @@ services:
     ports:
       - "19530:19530"
     networks:
-      - seminar
+      - benchmark
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
@@ -60,7 +60,7 @@ services:
     ports:
      - "8888:8888"
     networks:
-      - seminar
+      - benchmark
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
@@ -75,12 +75,12 @@ services:
     ports:
       - "8001:3000"
     networks:
-      - seminar
+      - benchmark
     depends_on:
       - "etcd"
       - "minio"
       - "standalone"
 
 networks:
-  seminar:
+  benchmark:
     external: true
