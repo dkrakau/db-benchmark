@@ -1,34 +1,36 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { SearchService } from './search.service';
-import { CreateSearchDto } from './dto/create-search.dto';
-import { UpdateSearchDto } from './dto/update-search.dto';
+import { Controller, Get, Query } from "@nestjs/common";
+import { ApiOkResponse, ApiQuery, ApiTags } from "@nestjs/swagger";
+import { TestRequestDto } from "src/milvus/dto/test.request.dts";
+import { Modes } from "src/model/ISCCGenerator.model";
+import { Unit } from "src/postgres/entities/unit.entity";
+import { SearchService } from "./search.service";
 
-@Controller('search')
+@ApiTags('Nearest Neighbor Search')
+@Controller("nns")
 export class SearchController {
-  constructor(private readonly searchService: SearchService) {}
 
-  @Post()
-  create(@Body() createSearchDto: CreateSearchDto) {
-    return this.searchService.create(createSearchDto);
+  constructor(private readonly searchService: SearchService) { }
+
+  @Get("/milvus/test")
+  @ApiQuery({ name: "unit", required: true, description: "Binary iscc string", schema: { type: "string" }, example: "1001011110100111011111111100011011000000100110000101011000010001" })
+  @ApiQuery({ name: "mode", enum: Modes, required: true, description: "Mode of unit", schema: { type: "string" }, example: "image" })
+  @ApiOkResponse({
+    description: "Result",
+    isArray: true
+  })
+  milvusTest(@Query() testRequestDto: TestRequestDto) {
+    return this.searchService.milvusTest(testRequestDto);
   }
 
-  @Get()
-  findAll() {
-    return this.searchService.findAll();
+  @Get("/postgres/test")
+  @ApiQuery({ name: "unit", required: true, description: "Binary iscc string", schema: { type: "string" }, example: "1001011110100111011111111100011011000000100110000101011000010001" })
+  @ApiQuery({ name: "mode", enum: Modes, required: true, description: "Mode of unit", schema: { type: "string" }, example: "image" })
+  @ApiOkResponse({
+    description: "Result",
+    isArray: false
+  })
+  postgresTest(@Query() testRequestDto: TestRequestDto): Promise<Unit[]> {
+    return this.searchService.postgresTest(testRequestDto);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.searchService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSearchDto: UpdateSearchDto) {
-    return this.searchService.update(+id, updateSearchDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.searchService.remove(+id);
-  }
 }
