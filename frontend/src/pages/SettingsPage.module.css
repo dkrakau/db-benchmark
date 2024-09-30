@@ -1,4 +1,6 @@
-.contentSettingsPage {}
+.contentSettingsPage {
+    display: flex;
+}
 
 .settingsList {
     display: flex;

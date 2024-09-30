@@ -1,4 +1,6 @@
-.contentNotFoundPage {}
+.contentNotFoundPage {
+    display: flex;
+}
 
 .error {
     height: 100%;

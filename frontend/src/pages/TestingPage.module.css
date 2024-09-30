@@ -1,4 +1,6 @@
-.contentTestingPage {}
+.contentTestingPage {
+    display: flex;
+}
 
 .items {
     display: flex;
@@ -15,4 +17,6 @@
     justify-content: center;
 }
 
-.selectionInfo {}
+.selectionInfo {
+    font-size: 12pt;
+}

@@ -7,7 +7,7 @@ const NotFoundPage: React.FC = () => {
         <IonPage>
             <IonHeader>
                 <IonToolbar>
-                    <IonTitle>Page not found</IonTitle>
+                    <IonTitle>Page Not Found</IonTitle>
                 </IonToolbar>
             </IonHeader>
             <IonContent fullscreen>

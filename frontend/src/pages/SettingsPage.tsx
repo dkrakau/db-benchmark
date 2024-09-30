@@ -15,7 +15,7 @@ const SettingsPage: React.FC = () => {
             <IonTitle size="large">Settings</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <IonContent className={styles.contentSettingsPage}>
+        <IonContent>
           <IonList className={styles.settingsList}>
             <IonItem>
               <IonInput label="Number of queries" value="100" />

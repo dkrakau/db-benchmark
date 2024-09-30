@@ -1,1 +1,3 @@
-.contentInformationPage {}
+.contentInformationPage {
+    display: flex;
+}

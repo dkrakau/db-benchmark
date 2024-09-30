@@ -1,7 +1,15 @@
-.informationCard {}
+.informationCard {
+    display: flex;
+}
 
-.title {}
+.title {
+    font-size: 20pt;
+}
 
-.subtitle {}
+.subtitle {
+    font-size: 16pt;
+}
 
-.content {}
+.content {
+    font-size: 12pt;
+}

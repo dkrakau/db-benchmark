@@ -1,4 +1,6 @@
-.contentHistoryPage {}
+.contentHistoryPage {
+    display: flex;
+}
 
 .items {
     display: flex;
