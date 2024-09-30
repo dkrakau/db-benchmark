@@ -1,12 +1,12 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { DataModule } from "./data/data.module";
 import { MilvusModule } from "./milvus/milvus.module";
 import { Asset } from "./postgres/entities/asset.entity";
 import { Audio, Image, Text, Video } from "./postgres/entities/unit.entity";
 import { PostgresModule } from "./postgres/postgres.module";
-import { SearchModule } from './search/search.module';
-import { DataModule } from './data/data.module';
+import { SearchModule } from "./search/search.module";
 
 @Module({
   imports:
