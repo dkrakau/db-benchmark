@@ -7,3 +7,5 @@ docs/
 *.bat
 *.cmd
 *.btm
+
+databases/postgres/data/db-iscc-250m.backup

@@ -9,11 +9,13 @@ import {
   setupIonicReact
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { layersOutline, readerOutline, settingsOutline } from 'ionicons/icons';
+import { informationCircleOutline, layersOutline, readerOutline, settingsOutline } from 'ionicons/icons';
 import { Redirect, Route } from 'react-router-dom';
-import Tab2 from './pages/History';
-import Tab3 from './pages/Settings';
-import Tab1 from './pages/Testing';
+import HistoryPage from "./pages/HistoryPage";
+import InformationPage from "./pages/InformationPage";
+import NotFoundPage from "./pages/NotFoundPage";
+import SettingsPage from "./pages/SettingsPage";
+import TestingPage from "./pages/TestingPage";
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -45,7 +47,11 @@ import '@ionic/react/css/palettes/dark.class.css';
 /* Theme variables */
 import './theme/variables.css';
 
+
+
 setupIonicReact();
+
+document.documentElement.classList.toggle('ion-palette-dark', false);
 
 const App: React.FC = () => (
   <IonApp>
@@ -53,16 +59,22 @@ const App: React.FC = () => (
       <IonTabs>
         <IonRouterOutlet>
           <Route exact path="/testing">
-            <Tab1 />
+            <TestingPage />
           </Route>
           <Route exact path="/history">
-            <Tab2 />
+            <HistoryPage />
+          </Route>
+          <Route exact path="/information">
+            <InformationPage />
           </Route>
           <Route path="/settings">
-            <Tab3 />
+            <SettingsPage />
           </Route>
           <Route exact path="/">
             <Redirect to="/testing" />
+          </Route>
+          <Route>
+            <NotFoundPage />
           </Route>
         </IonRouterOutlet>
         <IonTabBar slot="bottom">
@@ -73,6 +85,10 @@ const App: React.FC = () => (
           <IonTabButton tab="history" href="/history">
             <IonIcon aria-hidden="true" icon={readerOutline} />
             <IonLabel>History</IonLabel>
+          </IonTabButton>
+          <IonTabButton tab="information" href="/information">
+            <IonIcon aria-hidden="true" icon={informationCircleOutline} />
+            <IonLabel>Information</IonLabel>
           </IonTabButton>
           <IonTabButton tab="settings" href="/settings">
             <IonIcon aria-hidden="true" icon={settingsOutline} />

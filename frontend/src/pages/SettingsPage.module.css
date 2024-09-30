@@ -1,0 +1,17 @@
+.contentSettingsPage {
+    display: flex;
+}
+
+.settingsList {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.saveBtn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}

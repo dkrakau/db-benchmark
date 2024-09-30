@@ -1,0 +1,11 @@
+.fileViewerCard {
+    display: flex;
+}
+
+.fileViewerTitleCard {
+    font-size: 12pt;
+}
+
+.fileViewerSubtitleCard {
+    font-size: 12pt;
+}

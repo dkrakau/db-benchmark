@@ -1,0 +1,15 @@
+.informationCard {
+    display: block;
+}
+
+.title {
+    font-size: 20pt;
+}
+
+.subtitle {
+    font-size: 16pt;
+}
+
+.content {
+    font-size: 12pt;
+}
