@@ -1,4 +1,4 @@
-.content-testing-page {}
+.contentTestingPage {}
 
 .items {
     display: flex;
@@ -14,3 +14,5 @@
     align-items: center;
     justify-content: center;
 }
+
+.selectionInfo {}

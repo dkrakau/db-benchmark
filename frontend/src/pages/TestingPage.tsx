@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import DatabaseCard from "../components/DatabaseCard";
 import milvusLogo from '../pics/milvus-logo.png';
 import postgresLogo from '../pics/postgres-logo.png';
-import './Testing.css';
+import styles from "./TestingPage.module.css";
 
 interface DatabaseData {
   logo: string,
@@ -91,8 +91,8 @@ const TestingPage: React.FC = () => {
             <IonTitle size="large">Testing</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <IonContent className="content-testing-page">
-          <div className="items">
+        <IonContent className={styles.contentTestingPage}>
+          <div className={styles.items}>
             {
               Array.from(selection).map(([dbName, databaseData]) => (
                 <DatabaseCard
@@ -104,8 +104,8 @@ const TestingPage: React.FC = () => {
               ))
             }
           </div>
-          <div className="bottom">
-            <p className="selection-info">{getSelectionCount()} / {selection.size} selected</p>
+          <div className={styles.bottom}>
+            <p className={styles.selectionInfo}>{getSelectionCount()} / {selection.size} selected</p>
             <IonButton onClick={confirm} disabled={getSelectionCount() === 0 ? true : false}>Confirm</IonButton>
           </div>
         </IonContent>

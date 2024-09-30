@@ -8,14 +8,14 @@
     cursor: pointer;
 }
 
-.database-title-card {
+.databaseTitleCard {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: left;
 }
 
-.database-logo {
+.databaseLogo {
     width: 2.9rem;
     height: 2.9rem;
 }

@@ -1,13 +1,13 @@
-.content-settings-page {}
+.contentSettingsPage {}
 
-.settings-list {
+.settingsList {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 }
 
-.save-btn {
+.saveBtn {
     display: flex;
     flex-direction: column;
     align-items: center;

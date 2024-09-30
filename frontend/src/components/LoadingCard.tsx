@@ -1,6 +1,6 @@
 import { IonCard, IonCardHeader, IonCardSubtitle, IonCardTitle, IonIcon } from "@ionic/react";
 import { ellipsisHorizontal } from "ionicons/icons";
-import './LoadingCard.css';
+import styles from './LoadingCard.module.css';
 
 interface LoadingCardProps {
     state: string;
@@ -10,15 +10,15 @@ interface LoadingCardProps {
 
 const LoadingCard: React.FC<LoadingCardProps> = (props) => {
     return (
-        <IonCard className="loading-card">
+        <IonCard className={styles.loadingCard}>
             <IonCardHeader>
-                <IonCardTitle className="loading-title-card">
-                    <div className="rotate">
-                        <IonIcon className="rotating-img" src={ellipsisHorizontal} /> {/* sync */}
+                <IonCardTitle className={styles.loadingTitleCard}>
+                    <div className={styles.rotate}>
+                        <IonIcon className={styles.rotatingImg} src={ellipsisHorizontal} /> {/* sync */}
                     </div>
-                    <p className="loading-title">{props.state}</p>
+                    <p className={styles.loadingTitle}>{props.state}</p>
                 </IonCardTitle>
-                <IonCardSubtitle className="loading-subtitle">{props.query} / {props.queries}</IonCardSubtitle>
+                <IonCardSubtitle className={styles.loadingSubtitle}>{props.query} / {props.queries}</IonCardSubtitle>
             </IonCardHeader>
         </IonCard>
     );

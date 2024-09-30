@@ -1,20 +1,27 @@
-import { IonCard, IonCardHeader, IonCardSubtitle, IonCardTitle } from "@ionic/react";
-import './LoadingCard.css';
+import { IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle } from "@ionic/react";
+import styles from './InformationCard.module.css';
 
 interface InformationCardProps {
-    name: string;
+    title: string;
+    subtitle: string;
+    content: string;
 }
 
 const InformationCard: React.FC<InformationCardProps> = (props) => {
     return (
-        <IonCard className="information-card">
+        <IonCard className={styles.informationCard}>
             <IonCardHeader>
-                <IonCardTitle className="information-title-card">
-                    Information
+                <IonCardTitle className={styles.title}>
+                    {props.title}
                 </IonCardTitle>
-                <IonCardSubtitle className="information-card-subtitle">subtitle</IonCardSubtitle>
+                <IonCardSubtitle className={styles.subtitle}>
+                    {props.subtitle}
+                </IonCardSubtitle>
             </IonCardHeader>
-        </IonCard>
+            <IonCardContent className={styles.content}>
+                {props.content}
+            </IonCardContent>
+        </IonCard >
     );
 };
 

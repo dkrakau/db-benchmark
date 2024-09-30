@@ -1,5 +1,5 @@
 import { IonCard, IonCardHeader, IonCardSubtitle, IonCardTitle } from "@ionic/react";
-import './DatabaseCard.css';
+import styles from './DatabaseCard.module.css';
 
 interface DatabaseCardProps {
     dbName: string;
@@ -10,11 +10,11 @@ interface DatabaseCardProps {
 
 const DatabaseCard: React.FC<DatabaseCardProps> = ({ dbName, dbDescription, dbLogo, onClick }) => {
     return (
-        <IonCard className="databaseCard" id={dbName} onClick={onClick !== undefined ? () => onClick(dbName) : undefined}>
+        <IonCard className={styles.databaseCard} id={dbName} onClick={onClick !== undefined ? () => onClick(dbName) : undefined}>
             <IonCardHeader>
-                <IonCardTitle className="database-title-card">
-                    <img src={dbLogo} alt="Database logo" className="database-logo" />
-                    <p className="title">{dbName}</p>
+                <IonCardTitle className={styles.databaseTitleCard}>
+                    <img src={dbLogo} alt="Database logo" className={styles.databaseLogo} />
+                    <p className={styles.title}>{dbName}</p>
                 </IonCardTitle>
                 <IonCardSubtitle>{dbDescription}</IonCardSubtitle>
             </IonCardHeader>

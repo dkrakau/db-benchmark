@@ -1,6 +1,7 @@
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import ChartCard from "../components/ChartCard";
 import LoadingCard from "../components/LoadingCard";
-import './HistoryPage.css';
+import styles from "./HistoryPage.module.css";
 
 const HistoryPage: React.FC = () => {
   return (
@@ -16,8 +17,9 @@ const HistoryPage: React.FC = () => {
             <IonTitle size="large">History</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <IonContent className="content-history-page">
-          <div className="items">
+        <IonContent className={styles.contentHistoryPage}>
+          <div className={styles.items}>
+            <ChartCard />
             <LoadingCard state={"Loading"} query={5} queries={100} />
           </div>
         </IonContent>

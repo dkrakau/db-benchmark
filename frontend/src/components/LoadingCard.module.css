@@ -1,4 +1,4 @@
-.loading-card {
+.loadingCard {
     width: 60rem;
     height: 40em;
 
@@ -8,13 +8,13 @@
     justify-content: center;
 }
 
-.loading-title {
+.loadingTitle {
     margin: 0;
     font-size: 20pt;
     font-weight: bold;
 }
 
-.loading-subtitle {
+.loadingSubtitle {
     text-align: center;
     font-size: 16pt;
 }
@@ -29,7 +29,7 @@
     }
 }
 
-.rotating-img {
+.rotatingImg {
     width: 4rem;
     height: 4rem;
     animation: rotate 1s infinite;

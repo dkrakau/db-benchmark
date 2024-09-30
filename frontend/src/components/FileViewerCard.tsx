@@ -1,4 +1,5 @@
-import './FileViewerCard.css';
+import { IonCard, IonCardHeader, IonCardSubtitle, IonCardTitle } from "@ionic/react";
+import styles from './FileViewerCard.module.css';
 
 interface FileViewerCardProps {
     name: string;
@@ -6,10 +7,14 @@ interface FileViewerCardProps {
 
 const FileViewerCard: React.FC<FileViewerCardProps> = (props) => {
     return (
-        <div className="container">
-            <strong>{props.name}</strong>
-            <p>Explore <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-        </div>
+        <IonCard className={styles.fileViewerCard}>
+            <IonCardHeader>
+                <IonCardTitle className={styles.fileViewerTitleCard}>
+                    FileViewerCard
+                </IonCardTitle>
+                <IonCardSubtitle className={styles.fileViewerSubtitleCard}>subtitle</IonCardSubtitle>
+            </IonCardHeader>
+        </IonCard >
     );
 };
 
