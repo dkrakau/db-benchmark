@@ -1,5 +1,5 @@
 .informationCard {
-    display: flex;
+    display: block;
 }
 
 .title {

@@ -19,8 +19,8 @@ const HistoryPage: React.FC = () => {
         </IonHeader>
         <IonContent className={styles.contentHistoryPage}>
           <div className={styles.items}>
-            <ChartCard />
             <LoadingCard state={"Loading"} query={5} queries={100} />
+            <ChartCard />
           </div>
         </IonContent>
       </IonContent>
