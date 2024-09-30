@@ -98,7 +98,7 @@ export class MilvusService {
 
     await this.milvusProvider.useDatabase("iscc");
 
-    await this.dataProvider.load("./src/data/data-original.csv");
+    await this.dataProvider.load("./src/files/data-original.csv");
     const data: Data[] = this.dataProvider.get();
 
     const startTime = new Date().getTime();

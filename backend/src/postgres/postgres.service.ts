@@ -27,7 +27,7 @@ export class PostgresService {
 
     const startTime = new Date().getTime();
 
-    await this.dataProvider.load("./src/data/data-original.csv");
+    await this.dataProvider.load("./src/files/data-original.csv");
     const data: Data[] = this.dataProvider.get();
 
     data.forEach(async (data) => {
