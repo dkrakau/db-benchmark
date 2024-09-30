@@ -1,8 +1,8 @@
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
-import ExploreContainer from '../components/ExploreContainer';
-import './History.css';
+import LoadingCard from "../components/LoadingCard";
+import './HistoryPage.css';
 
-const History: React.FC = () => {
+const HistoryPage: React.FC = () => {
   return (
     <IonPage>
       <IonHeader>
@@ -16,10 +16,14 @@ const History: React.FC = () => {
             <IonTitle size="large">History</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <ExploreContainer name="History page" />
+        <IonContent className="content-history-page">
+          <div className="items">
+            <LoadingCard state={"Loading"} query={5} queries={100} />
+          </div>
+        </IonContent>
       </IonContent>
-    </IonPage>
+    </IonPage >
   );
 };
 
-export default History;
+export default HistoryPage;
