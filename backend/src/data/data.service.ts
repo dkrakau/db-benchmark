@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { TestDataProvider } from "src/provider/testdata.provider";
+import { TestResponseDto } from "src/search/dto/test.response.dto";
 import { DataListDto } from "./dto/data-list.dto";
 import { DataLoadDto } from "./dto/data-load.dto";
 import { DataSaveDto } from "./dto/data-save.dto";
@@ -18,8 +19,10 @@ export class DataService {
     return this.testDataProvider.listFiles(this.path + dataListDto.db);;
   }
 
-  async load(dataLoadDto: DataLoadDto): Promise<string | Buffer> {
-    return await this.testDataProvider.readFileData(this.path + dataLoadDto.db + "/" + dataLoadDto.file);
+  async load(dataLoadDto: DataLoadDto): Promise<TestResponseDto[]> {
+    let dataString: string = (await this.testDataProvider.readFileData(this.path + dataLoadDto.db + "/" + dataLoadDto.file)).toString();
+    let testdata: TestResponseDto[] = JSON.parse(dataString);
+    return testdata;
   }
 
   save(dataSaveDto: DataSaveDto): void {
@@ -31,6 +34,6 @@ export class DataService {
       + date.getMinutes() + "-"
       + date.getSeconds() + "_"
       + dataSaveDto.db + ".json";
-    this.testDataProvider.createFile(this.path + dataSaveDto.db, filename, dataSaveDto.data);
+    this.testDataProvider.createFile(this.path + dataSaveDto.db, filename, JSON.stringify(dataSaveDto.testdata));
   }
 }

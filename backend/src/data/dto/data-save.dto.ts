@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { TestResponseDto } from "src/search/dto/test.response.dto";
 
 export class DataSaveDto {
 
@@ -11,10 +12,11 @@ export class DataSaveDto {
     db: string;
 
     @ApiProperty({
-        name: "data",
+        name: "testdata",
         required: true,
-        description: "Data"
+        description: "Testdata to be saved",
+        type: [TestResponseDto]
     })
-    data: string;
+    testdata: TestResponseDto[];
 
 }

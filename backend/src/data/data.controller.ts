@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Post, Query } from "@nestjs/common";
 import { ApiOkResponse, ApiQuery, ApiTags } from "@nestjs/swagger";
+import { TestResponseDto } from "src/search/dto/test.response.dto";
 import { DataService } from "./data.service";
 import { DataListDto } from "./dto/data-list.dto";
 import { DataLoadDto } from "./dto/data-load.dto";
@@ -15,8 +16,9 @@ export class DataController {
   @Get("/list")
   @ApiQuery({ name: "db", required: true, description: "Database name", schema: { type: "string" }, example: "milvus" })
   @ApiOkResponse({
-    description: "Result",
-    isArray: false
+    description: "Filenames",
+    type: String,
+    isArray: true
   })
   list(@Query() dataListDto: DataListDto): string[] {
     return this.dataService.list(dataListDto);
@@ -26,16 +28,19 @@ export class DataController {
   @ApiQuery({ name: "db", required: true, description: "Database name", schema: { type: "string" }, example: "milvus" })
   @ApiQuery({ name: "file", required: true, description: "File name", schema: { type: "string" }, example: "filename.json" })
   @ApiOkResponse({
-    description: "Result",
-    isArray: false
+    status: 200,
+    description: "Testdata",
+    type: TestResponseDto,
+    isArray: true
   })
-  load(@Query() dataLoadDto: DataLoadDto) {
+  load(@Query() dataLoadDto: DataLoadDto): Promise<TestResponseDto[]> {
     return this.dataService.load(dataLoadDto);
   }
 
   @Post("/save")
   @ApiOkResponse({
-    description: "Result",
+    status: 201,
+    description: "Testdata saved successfully",
     isArray: false
   })
   save(@Body() dataSaveDto: DataSaveDto) {
