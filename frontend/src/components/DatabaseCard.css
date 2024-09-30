@@ -1,0 +1,28 @@
+.databaseCard {
+    width: fit-content;
+    border: 2px solid white;
+}
+
+.databaseCard:hover {
+    border: 2px solid #0054E9;
+    cursor: pointer;
+}
+
+.database-title-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: left;
+}
+
+.database-logo {
+    width: 2.9rem;
+    height: 2.9rem;
+}
+
+.title {
+    margin: 0;
+    padding-left: 1rem;
+    font-size: 1.7rem;
+    height: fit-content;
+}
