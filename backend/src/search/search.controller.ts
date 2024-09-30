@@ -1,8 +1,9 @@
 import { Controller, Get, Query } from "@nestjs/common";
 import { ApiOkResponse, ApiQuery, ApiTags } from "@nestjs/swagger";
-import { TestRequestDto } from "src/milvus/dto/test.request.dts";
 import { Modes } from "src/model/ISCCGenerator.model";
 import { Unit } from "src/postgres/entities/unit.entity";
+import { TestRequestDto } from "./dto/test.request.dto";
+import { TestResponseDto } from "./dto/test.response.dto";
 import { SearchService } from "./search.service";
 
 @ApiTags('Nearest Neighbor Search')
@@ -16,9 +17,10 @@ export class SearchController {
   @ApiQuery({ name: "mode", enum: Modes, required: true, description: "Mode of unit", schema: { type: "string" }, example: "image" })
   @ApiOkResponse({
     description: "Result",
+    type: TestResponseDto,
     isArray: true
   })
-  milvusTest(@Query() testRequestDto: TestRequestDto) {
+  milvusTest(@Query() testRequestDto: TestRequestDto): Promise<TestResponseDto> {
     return this.searchService.milvusTest(testRequestDto);
   }
 

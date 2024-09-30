@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
 import { BinaryVector, ConsistencyLevelEnum, DataType, MetricType, SearchParam, SearchReq, SearchResults } from "@zilliz/milvus2-sdk-node";
-import { TestRequestDto } from "src/milvus/dto/test.request.dts";
 import { ISCCGenerator, Modes } from "src/model/ISCCGenerator.model";
 import { getFillDuration } from "src/model/time.model";
 import { Asset } from "src/postgres/entities/asset.entity";
@@ -10,6 +9,8 @@ import { Audio, Image, Text, Unit, Video } from "src/postgres/entities/unit.enti
 import { DataProvider } from "src/provider/data.provider";
 import { MilvusProvider } from "src/provider/milvus.provider";
 import { Repository } from "typeorm";
+import { TestRequestDto } from "./dto/test.request.dto";
+import { TestResponseDto } from "./dto/test.response.dto";
 
 @Injectable()
 export class SearchService {
@@ -33,7 +34,9 @@ export class SearchService {
     return bytes;
   }
 
-  public async milvusTest(testRequestDto: TestRequestDto): Promise<SearchResults> {
+  public async milvusTest(testRequestDto: TestRequestDto): Promise<TestResponseDto> {
+
+    const startTime = new Date().getTime();
 
     await this.milvusProvider.useDatabase("iscc");
 
@@ -57,28 +60,22 @@ export class SearchService {
     }
 
     let response: SearchResults = await this.milvusProvider.nns(searchReq);
-    //console.log({ id: response.results[0].id, unit: await this.binaryVectorToUnit(response.results[0]["vector"]), distance: response.results[0].score });
 
-    return response;
-  }
+    const endTime = new Date().getTime();
+    const time = endTime - startTime;
 
-  private async binaryVectorToUnit(vec: BinaryVector): Promise<string> {
-    let unit = "";
-    for (let i = 0; i < vec.length; i++) {
-      let unitSegment = "";
-      let binaryString = (vec[i] >>> 0).toString(2);
-      let numberOfZerosToFill = 8 - binaryString.length;
-      if (numberOfZerosToFill !== 0) {
-        for (let i = 0; i < numberOfZerosToFill; i++) {
-          unitSegment = unitSegment + "0";
-        }
-        unitSegment = unitSegment + binaryString;
-      } else {
-        unitSegment = binaryString;
-      }
-      unit = unit + unitSegment;
-    }
-    return unit;
+    const testResult: TestResponseDto = { milliseconds: time, results: [] };
+
+    response.results.forEach(result => (
+      testResult.results.push({
+        score: result.score,
+        unit: this.milvusProvider.binaryVectorToUnit(result.vector),
+        asset_id: result.asset_id,
+        source: "-"
+      })
+    ));
+
+    return testResult;
   }
 
   async postgresTest(testRequestDto: TestRequestDto): Promise<Unit[]> {

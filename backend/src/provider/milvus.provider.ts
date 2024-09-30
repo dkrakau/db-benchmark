@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import {
+    BinaryVector,
     BoolResponse, CreateIndexSimpleReq,
     DataType,
     DeleteReq,
@@ -234,6 +235,25 @@ export class MilvusProvider {
 
     public async getVersion(): Promise<GetVersionResponse> {
         return await this.client.getVersion();
+    }
+
+    public binaryVectorToUnit(vec: BinaryVector): string {
+        let unit = "";
+        for (let i = 0; i < vec.length; i++) {
+            let unitSegment = "";
+            let binaryString = (vec[i] >>> 0).toString(2);
+            let numberOfZerosToFill = 8 - binaryString.length;
+            if (numberOfZerosToFill !== 0) {
+                for (let i = 0; i < numberOfZerosToFill; i++) {
+                    unitSegment = unitSegment + "0";
+                }
+                unitSegment = unitSegment + binaryString;
+            } else {
+                unitSegment = binaryString;
+            }
+            unit = unit + unitSegment;
+        }
+        return unit;
     }
 
 }

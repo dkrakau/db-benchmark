@@ -3,10 +3,10 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { getFillDuration } from "src/model/time.model";
 import { Data, DataProvider } from "src/provider/data.provider";
 import { Repository } from "typeorm";
+import { InfoResponseDto } from "./dto/info.response.dto";
 import { Asset } from "./entities/asset.entity";
 import { PostgresMessage } from "./entities/postgres.message.entity";
 import { Audio, Image, Text, Video } from "./entities/unit.entity";
-import { InfoResponseDto } from "./response-dto/info.response.dto";
 
 @Injectable()
 export class PostgresService {

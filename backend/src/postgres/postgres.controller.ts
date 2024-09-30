@@ -1,8 +1,8 @@
 import { Controller, Get } from "@nestjs/common";
 import { ApiOkResponse, ApiTags } from "@nestjs/swagger";
+import { InfoResponseDto } from "./dto/info.response.dto";
 import { PostgresMessage } from "./entities/postgres.message.entity";
 import { PostgresService } from "./postgres.service";
-import { InfoResponseDto } from "./response-dto/info.response.dto";
 
 @ApiTags("PostgreSQL")
 @Controller("postgres")
