@@ -8,4 +8,4 @@ docs/
 *.cmd
 *.btm
 
-databases/postgres/data/
+databases/postgres/data/db-iscc-250m.backup
