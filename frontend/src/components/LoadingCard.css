@@ -1,0 +1,36 @@
+.loading-card {
+    width: 60rem;
+    height: 40em;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-title {
+    margin: 0;
+    font-size: 20pt;
+    font-weight: bold;
+}
+
+.loading-subtitle {
+    text-align: center;
+    font-size: 16pt;
+}
+
+.rotate {
+    text-align: center;
+}
+
+@keyframes rotate {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.rotating-img {
+    width: 4rem;
+    height: 4rem;
+    animation: rotate 1s infinite;
+}
