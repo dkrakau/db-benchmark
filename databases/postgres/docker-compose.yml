@@ -11,7 +11,7 @@ services:
     ports:
       - 5432:5432
     networks:
-      - seminar
+      - benchmark
 
   pgadmin:
     image: dpage/pgadmin4:8.12.0
@@ -22,7 +22,7 @@ services:
     ports:
       - 8002:15432
     networks:
-      - seminar
+      - benchmark
     volumes:
       - pgadmin:/var/lib/pgadmin
     depends_on:
@@ -33,5 +33,5 @@ volumes:
   pgadmin:
 
 networks:
-  seminar:
+  benchmark:
     external: true
