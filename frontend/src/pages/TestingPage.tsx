@@ -1,56 +1,38 @@
 import { IonButton, IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { DatabaseData } from "../App";
 import DatabaseCard from "../components/DatabaseCard";
-import milvusLogo from '../pics/milvus-logo.png';
-import postgresLogo from '../pics/postgres-logo.png';
+import { LoadingState } from "../components/LoadingCard";
+import TestCard from "../components/TestCard";
 import styles from "./TestingPage.module.css";
 
-interface DatabaseData {
-  logo: string,
-  description: string,
-  selected: boolean,
+interface TestingPageProps {
+  isConfirmed: boolean,
+  setIsConfirmed: (x: boolean) => void,
+  selectedDbs: string[],
+  setSelectedDbs: (array: string[]) => void,
+  dbs: Map<string, DatabaseData>,
+  setDbs: (map: Map<string, DatabaseData>) => void,
+  updateDbs: (key: string, value: DatabaseData) => void
 }
 
-const TestingPage: React.FC = () => {
-
-  const [selection, setSelection] = useState<Map<string, DatabaseData>>(new Map([
-    [
-      "Milvus",
-      {
-        logo: milvusLogo,
-        description: "Versoin 2.4.4",
-        selected: false
-      }
-    ],
-    [
-      "Postgres",
-      {
-        logo: postgresLogo,
-        description: "Version 16.4",
-        selected: false
-      }
-    ],
-  ]));
-
-  const updateSelection = (key: string, value: DatabaseData) => {
-    setSelection(new Map(selection.set(key, value)));
-  }
+const TestingPage: React.FC<TestingPageProps> = (props) => {
 
   const onDatabaseClicked = (dbName: string) => {
-    const databaseData: DatabaseData | undefined = selection.get(dbName);
+    const databaseData: DatabaseData | undefined = props.dbs.get(dbName);
     if (databaseData !== undefined) {
       if (databaseData.selected) {
         databaseData.selected = false;
       } else {
         databaseData.selected = true;
       }
-      updateSelection(dbName, databaseData);
+      props.updateDbs(dbName, databaseData);
     }
   };
 
   const getSelectionCount = () => {
     let selectionCount = 0;
-    for (let [dbName, databaseData] of selection) {
+    for (let [dbName, databaseData] of props.dbs) {
       if (databaseData?.selected) {
         selectionCount++;
       }
@@ -59,12 +41,22 @@ const TestingPage: React.FC = () => {
   };
 
   const confirm = () => {
-    console.log("confirm");
-    console.log(selection);
-  };
+    props.setIsConfirmed(true);
+    const selectedDbs: string[] = [];
+    for (let [dbName, databaseData] of props.dbs) {
+      if (databaseData?.selected) {
+        selectedDbs.push(dbName);
+      }
+    }
+    props.setSelectedDbs(selectedDbs);
+    const firstSelectedDatabaseData: DatabaseData | undefined = props.dbs.get(selectedDbs[0]);
+    if (firstSelectedDatabaseData !== undefined) {
+      firstSelectedDatabaseData.state = LoadingState.loading;
+    }
+  }
 
-  const renderSelectedDatabases = () => {
-    for (let [dbName, databaseData] of selection) {
+  const renderSelectedDbs = () => {
+    for (let [dbName, databaseData] of props.dbs) {
       if (databaseData?.selected) {
         document.getElementById(dbName)?.setAttribute("style", "border: 2px solid #0054E9;");
       } else {
@@ -74,9 +66,8 @@ const TestingPage: React.FC = () => {
   };
 
   useEffect(() => {
-    renderSelectedDatabases();
-    console.log(selection);
-  }, [selection]);
+    renderSelectedDbs();
+  }, [props.dbs]);
 
   return (
     <IonPage>
@@ -93,10 +84,22 @@ const TestingPage: React.FC = () => {
         </IonHeader>
         <IonContent className={styles.contentTestingPage}>
           <div className={styles.items}>
-            {
-              Array.from(selection).map(([dbName, databaseData]) => (
+            {props.isConfirmed
+              ? Array.from(props.dbs).map(([dbName, databaseData]) => (
+                databaseData.selected ?
+                  <TestCard
+                    key={dbName + "-test-card"}
+                    dbName={dbName}
+                    selectedDbs={props.selectedDbs}
+                    setSelectedDbs={props.setSelectedDbs}
+                    dbs={props.dbs}
+                    setDbs={props.setDbs}
+                    updateDbs={props.updateDbs} />
+                  : <></>
+              ))
+              : Array.from(props.dbs).map(([dbName, databaseData]) => (
                 <DatabaseCard
-                  key={dbName + "-db"}
+                  key={dbName + "-database-card"}
                   dbName={dbName}
                   dbDescription={databaseData.description}
                   dbLogo={databaseData.logo}
@@ -104,10 +107,12 @@ const TestingPage: React.FC = () => {
               ))
             }
           </div>
-          <div className={styles.bottom}>
-            <p className={styles.selectionInfo}>{getSelectionCount()} / {selection.size} selected</p>
-            <IonButton onClick={confirm} disabled={getSelectionCount() === 0 ? true : false}>Confirm</IonButton>
-          </div>
+          {props.isConfirmed
+            ? <></>
+            : <div className={styles.bottom}>
+              <p className={styles.selectionInfo}>{getSelectionCount()} / {props.dbs.size} selected</p>
+              <IonButton onClick={confirm} disabled={getSelectionCount() === 0 ? true : false}>Confirm</IonButton>
+            </div>}
         </IonContent>
       </IonContent>
     </IonPage>

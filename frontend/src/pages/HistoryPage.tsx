@@ -1,9 +1,21 @@
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import { DatabaseData } from "../App";
 import ChartCard from "../components/ChartCard";
+import FileViewerCard from "../components/FileViewerCard";
 import LoadingCard from "../components/LoadingCard";
 import styles from "./HistoryPage.module.css";
 
-const HistoryPage: React.FC = () => {
+interface HistoryPageProps {
+  isConfirmed: boolean,
+  setIsConfirmed: (x: boolean) => void,
+  selectedDbs: string[],
+  setSelectedDbs: (array: string[]) => void,
+  dbs: Map<string, DatabaseData>,
+  setDbs: (map: Map<string, DatabaseData>) => void,
+  updateDbs: (key: string, value: DatabaseData) => void
+}
+
+const HistoryPage: React.FC<HistoryPageProps> = (props) => {
   return (
     <IonPage>
       <IonHeader>
@@ -19,8 +31,9 @@ const HistoryPage: React.FC = () => {
         </IonHeader>
         <IonContent className={styles.contentHistoryPage}>
           <div className={styles.items}>
-            <LoadingCard state={"Loading"} query={5} queries={100} />
-            <ChartCard />
+            <LoadingCard dbName={"dbName"} state={"Loading"} queryCount={5} queriesTotal={100} />
+            <ChartCard testdata={[]} />
+            <FileViewerCard name="" />
           </div>
         </IonContent>
       </IonContent>
