@@ -10,7 +10,9 @@ import {
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { informationCircleOutline, layersOutline, readerOutline, settingsOutline } from 'ionicons/icons';
+import { useEffect, useState } from "react";
 import { Redirect, Route } from 'react-router-dom';
+import { LoadingState } from "./components/LoadingCard";
 import HistoryPage from "./pages/HistoryPage";
 import InformationPage from "./pages/InformationPage";
 import NotFoundPage from "./pages/NotFoundPage";
@@ -47,22 +49,26 @@ import '@ionic/react/css/palettes/dark.class.css';
 /* import '@ionic/react/css/palettes/dark.system.css'; */
 
 /* Theme variables */
-import { useState } from "react";
-import { LoadingState } from "./components/LoadingCard";
+import { useStorage } from "./hooks/useStorage";
 import './theme/variables.css';
 
 setupIonicReact();
 
-document.documentElement.classList.toggle('ion-palette-dark', false);
-
 export interface DatabaseData {
   logo: string,
-  description: string,
+  version: string,
   selected: boolean,
   state: LoadingState
 }
 
 const App: React.FC = () => {
+
+  const { settings } = useStorage();
+  const { loadSettings } = useStorage();
+
+  const [queriesTotal, setQueriesTotal] = useState<number>(0);
+  const [cutOff, setCutOff] = useState<number>(0);
+  const [isDarkModeEnabled, setIsDarkModeEnabled] = useState<boolean>(false);
 
   const [isConfirmed, setIsConfirmed] = useState<boolean>(false);
   const [selectedDbs, setSelectedDbs] = useState<string[]>([]);
@@ -71,7 +77,7 @@ const App: React.FC = () => {
       "Milvus",
       {
         logo: milvusLogo,
-        description: "Versoin 2.4.4",
+        version: "2.4.10",
         selected: false,
         state: LoadingState.loading,
       }
@@ -80,7 +86,7 @@ const App: React.FC = () => {
       "Postgres",
       {
         logo: postgresLogo,
-        description: "Version 16.4",
+        version: "16.4",
         selected: false,
         state: LoadingState.loading,
       }
@@ -91,7 +97,11 @@ const App: React.FC = () => {
     setDbs(new Map(dbs.set(key, value)));
   }
 
-  const resetPage = () => {
+  const resetPage = async () => {
+    let settings = await loadSettings();
+    setQueriesTotal(settings.queriesTotal);
+    setCutOff(settings.cutOff);
+    setIsDarkModeEnabled(settings.isDarkModeEnabled);
     setIsConfirmed(false);
     for (let [dbName, databaseData] of dbs) {
       if (databaseData?.selected) {
@@ -101,6 +111,15 @@ const App: React.FC = () => {
     }
   }
 
+  useEffect(() => {
+    if (settings !== undefined) {
+      setQueriesTotal(settings?.queriesTotal);
+      setCutOff(settings?.cutOff);
+      document.documentElement.classList.toggle('ion-palette-dark', settings?.isDarkModeEnabled);
+      setIsDarkModeEnabled(settings?.isDarkModeEnabled);
+    }
+  }, [settings]);
+
   return (
     <IonApp>
       <IonReactRouter>
@@ -108,6 +127,9 @@ const App: React.FC = () => {
           <IonRouterOutlet>
             <Route exact path="/testing">
               <TestingPage
+                queriesTotal={queriesTotal}
+                cutOff={cutOff}
+                isDarkModeEnabled={isDarkModeEnabled}
                 isConfirmed={isConfirmed}
                 setIsConfirmed={setIsConfirmed}
                 selectedDbs={selectedDbs}
@@ -119,6 +141,9 @@ const App: React.FC = () => {
             </Route>
             <Route exact path="/history">
               <HistoryPage
+                queriesTotal={queriesTotal}
+                cutOff={cutOff}
+                isDarkModeEnabled={isDarkModeEnabled}
                 isConfirmed={isConfirmed}
                 setIsConfirmed={setIsConfirmed}
                 selectedDbs={selectedDbs}
@@ -132,7 +157,14 @@ const App: React.FC = () => {
               <InformationPage />
             </Route>
             <Route path="/settings">
-              <SettingsPage />
+              <SettingsPage
+                queriesTotal={queriesTotal}
+                setQueriesTotal={setQueriesTotal}
+                cutOff={cutOff}
+                setCutOff={setCutOff}
+                isDarkModeEnabled={isDarkModeEnabled}
+                setIsDarkModeEnabled={setIsDarkModeEnabled}
+              />
             </Route>
             <Route exact path="/">
               <Redirect to="/testing" />

@@ -1,12 +1,16 @@
 import { IonButton, IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { DatabaseData } from "../App";
 import DatabaseCard from "../components/DatabaseCard";
 import { LoadingState } from "../components/LoadingCard";
 import TestCard from "../components/TestCard";
+import { ISCCGenerator } from "../model/ISCCGenerator";
 import styles from "./TestingPage.module.css";
 
 interface TestingPageProps {
+  queriesTotal: number,
+  cutOff: number,
+  isDarkModeEnabled: boolean,
   isConfirmed: boolean,
   setIsConfirmed: (x: boolean) => void,
   selectedDbs: string[],
@@ -17,6 +21,8 @@ interface TestingPageProps {
 }
 
 const TestingPage: React.FC<TestingPageProps> = (props) => {
+
+  const testUnits = new ISCCGenerator().generateUnits(props.queriesTotal)
 
   const onDatabaseClicked = (dbName: string) => {
     const databaseData: DatabaseData | undefined = props.dbs.get(dbName);
@@ -58,9 +64,11 @@ const TestingPage: React.FC<TestingPageProps> = (props) => {
   const renderSelectedDbs = () => {
     for (let [dbName, databaseData] of props.dbs) {
       if (databaseData?.selected) {
-        document.getElementById(dbName)?.setAttribute("style", "border: 2px solid #0054E9;");
+        let dbCard = document.getElementById(dbName)!;
+        dbCard.style.border = "2px solid var(--ion-color-secondary)";
       } else {
-        document.getElementById(dbName)?.setAttribute("style", "border: 2px solid white;");
+        let dbCard = document.getElementById(dbName)!;
+        dbCard.style.border = "2px solid var(--ion-color-light-shade)";
       }
     }
   };
@@ -88,20 +96,24 @@ const TestingPage: React.FC<TestingPageProps> = (props) => {
               ? Array.from(props.dbs).map(([dbName, databaseData]) => (
                 databaseData.selected ?
                   <TestCard
-                    key={dbName + "-test-card"}
+                    key={dbName}
+                    units={testUnits}
+                    queriesTotal={props.queriesTotal}
+                    cutOff={props.cutOff}
+                    isDarkModeEnabled={props.isDarkModeEnabled}
                     dbName={dbName}
                     selectedDbs={props.selectedDbs}
                     setSelectedDbs={props.setSelectedDbs}
                     dbs={props.dbs}
                     setDbs={props.setDbs}
                     updateDbs={props.updateDbs} />
-                  : <></>
+                  : <React.Fragment key={dbName} />
               ))
               : Array.from(props.dbs).map(([dbName, databaseData]) => (
                 <DatabaseCard
-                  key={dbName + "-database-card"}
+                  key={dbName}
                   dbName={dbName}
-                  dbDescription={databaseData.description}
+                  dbVersion={databaseData.version}
                   dbLogo={databaseData.logo}
                   onClick={onDatabaseClicked} />
               ))

@@ -6,6 +6,9 @@ import LoadingCard from "../components/LoadingCard";
 import styles from "./HistoryPage.module.css";
 
 interface HistoryPageProps {
+  queriesTotal: number,
+  cutOff: number,
+  isDarkModeEnabled: boolean,
   isConfirmed: boolean,
   setIsConfirmed: (x: boolean) => void,
   selectedDbs: string[],
@@ -31,9 +34,20 @@ const HistoryPage: React.FC<HistoryPageProps> = (props) => {
         </IonHeader>
         <IonContent className={styles.contentHistoryPage}>
           <div className={styles.items}>
-            <LoadingCard dbName={"dbName"} state={"Loading"} queryCount={5} queriesTotal={100} />
-            <ChartCard testdata={[]} />
-            <FileViewerCard name="" />
+            <LoadingCard
+              dbName={"dbName"}
+              state={"Loading"}
+              queryCount={5}
+              queriesTotal={100} />
+            <ChartCard
+              isDarkModeEnabled={props.isDarkModeEnabled}
+              dbName={""}
+              databaseData={props.dbs.get("Milvus")!}
+              testdata={[]}
+              excludeFirst={false} />
+            <FileViewerCard
+              dbName={"Milvus"}
+              tests={["hallo", "dasd"]} />
           </div>
         </IonContent>
       </IonContent>

@@ -12,10 +12,14 @@ export interface Result {
 
 export interface Testdata {
     milliseconds: number;
-    results: Result[];
+    //results: Result[];
 }
 
 interface TestCardProps {
+    units: string[],
+    queriesTotal: number,
+    cutOff: number,
+    isDarkModeEnabled: boolean,
     dbName: string,
     selectedDbs: string[],
     setSelectedDbs: (array: string[]) => void,
@@ -26,23 +30,38 @@ interface TestCardProps {
 
 const TestCard: React.FC<TestCardProps> = (props) => {
 
-    const queriesTotal = 2;
     const [state, setState] = useState<LoadingState>(props.dbs.get(props.dbName)!.state);
     const [queryCount, setQueryCount] = useState<number>(1);
-    const [testdata, setTestdata] = useState<Testdata[]>([]);
+    const [tests, setTests] = useState<Testdata[]>([]);
 
-    const testDatabase = async () => {
-        const testdata: Testdata[] = [];
-        for (let i = 1; i <= queriesTotal; i++) {
-            testdata.push(await fetch("http://localhost:8080/nns/" + props.dbName.toLowerCase() + "/test?unit=1001011110100111011111111100011011000000100110000101011000010001&mode=image").then(response => response.json()) as Testdata);
-            setQueryCount(i);
-        }
-        return testdata;
+    const generateFoldername = (): string => {
+        const date = new Date();
+        return date.getFullYear() + "-"
+            + date.getMonth() + "-"
+            + date.getDay() + "_"
+            + date.getHours() + "-"
+            + date.getMinutes() + "-"
+            + date.getSeconds() + "_"
+            + props.dbName;
     }
 
-    const saveTestdata = async (tests: Testdata[]) => {
-        const data = {
+    const testDatabase = async () => {
+        const foldername = generateFoldername();
+        let tests: Testdata[] = [];
+        for (let i = 0; i < props.queriesTotal; i++) {
+            setQueryCount(() => i + 1);
+            const testdata: Testdata = await fetch("http://localhost:8080/nns/" + props.dbName.toLowerCase() + "/test?unit=" + props.units[i] + "&mode=image").then(response => response.json()) as Testdata;
+            tests.push({ milliseconds: testdata.milliseconds });
+            await saveTestdata((i + 1) + "-query.json", foldername, testdata);
+        }
+        setTests(tests);
+    }
+
+    const saveTestdata = async (filename: string, foldername: string, tests: Testdata) => {
+        const dataSaveRequestBody = {
             db: props.dbName,
+            foldername: foldername,
+            filename: filename,
             testdata: tests
         }
         await fetch("http://localhost:8080/data/save", {
@@ -50,15 +69,13 @@ const TestCard: React.FC<TestCardProps> = (props) => {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(dataSaveRequestBody)
         });
     }
 
     useEffect(() => {
         if (state === LoadingState.loading) {
-            testDatabase().then(testdata => {
-                saveTestdata(testdata);
-                setTestdata(testdata);
+            testDatabase().then(() => {
                 setState(LoadingState.received);
             });
         }
@@ -67,8 +84,16 @@ const TestCard: React.FC<TestCardProps> = (props) => {
     return (
         <>
             {state === LoadingState.received
-                ? <ChartCard testdata={testdata} />
-                : <LoadingCard dbName={props.dbName} state={state} queryCount={queryCount} queriesTotal={queriesTotal} />}
+                ? <ChartCard
+                    isDarkModeEnabled={props.isDarkModeEnabled}
+                    dbName={props.dbName}
+                    databaseData={props.dbs.get(props.dbName)!}
+                    testdata={tests} excludeFirst={true} />
+                : <LoadingCard
+                    dbName={props.dbName}
+                    state={state}
+                    queryCount={queryCount}
+                    queriesTotal={props.queriesTotal} />}
         </>
     );
 };

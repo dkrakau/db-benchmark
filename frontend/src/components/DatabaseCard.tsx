@@ -3,12 +3,12 @@ import styles from './DatabaseCard.module.css';
 
 interface DatabaseCardProps {
     dbName: string;
-    dbDescription: string;
+    dbVersion: string;
     dbLogo: string;
     onClick?: (dbName: string) => void;
 }
 
-const DatabaseCard: React.FC<DatabaseCardProps> = ({ dbName, dbDescription, dbLogo, onClick }) => {
+const DatabaseCard: React.FC<DatabaseCardProps> = ({ dbName, dbVersion, dbLogo, onClick }) => {
     return (
         <IonCard className={styles.databaseCard} id={dbName} onClick={onClick !== undefined ? () => onClick(dbName) : undefined}>
             <IonCardHeader>
@@ -16,7 +16,7 @@ const DatabaseCard: React.FC<DatabaseCardProps> = ({ dbName, dbDescription, dbLo
                     <img src={dbLogo} alt="Database logo" className={styles.databaseLogo} />
                     <p className={styles.title}>{dbName}</p>
                 </IonCardTitle>
-                <IonCardSubtitle>{dbDescription}</IonCardSubtitle>
+                <IonCardSubtitle>{"Version " + dbVersion}</IonCardSubtitle>
             </IonCardHeader>
         </IonCard>
     );
