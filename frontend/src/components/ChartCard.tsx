@@ -1,13 +1,13 @@
 import { IonCard, IonCardHeader } from "@ionic/react";
 import Chart from "react-google-charts";
 import styles from './ChartCard.module.css';
+import { Testdata } from "./TestCard";
 
 interface ChartCardProps {
-    height: number;
-    width: number;
+    testdata: Testdata[];
 }
 
-const ChartCard: React.FC = () => {
+const ChartCard: React.FC<ChartCardProps> = (props) => {
 
     /* const data = [
       [
