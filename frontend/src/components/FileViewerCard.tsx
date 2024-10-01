@@ -1,38 +1,35 @@
-import { IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonInfiniteScroll, IonItem, IonList } from "@ionic/react";
+import { IonButton, IonCard, IonCardContent, IonCol, IonGrid, IonRow, IonSelect, IonSelectOption } from "@ionic/react";
 import styles from './FileViewerCard.module.css';
 
 interface FileViewerCardProps {
-    name: string;
+    dbName: string;
+    tests: string[];
+    /* setSelectedTest: (x: string) => void; */
 }
 
-const FileViewerCard: React.FC<FileViewerCardProps> = (props) => {
-    return (
-        <IonCard className={styles.fileViewerCard}>
-            <IonCardHeader>
-                <IonCardTitle className={styles.fileViewerTitleCard}>
-                    FileViewerCard
-                </IonCardTitle>
-                <IonCardSubtitle className={styles.fileViewerSubtitleCard}>subtitle</IonCardSubtitle>
-            </IonCardHeader>
-            <IonCardContent>
-                <IonInfiniteScroll>
-                    <IonList>
-                        <IonItem>test</IonItem>
-                        <IonItem>test</IonItem>
-                        <IonItem>test</IonItem>
-                        <IonItem>test</IonItem>
-                        <IonItem>test</IonItem>
-                        <IonItem>test</IonItem>
-                        <IonItem>test</IonItem>
-                        <IonItem>test</IonItem>
-                        <IonItem>test</IonItem>
-                        <IonItem>test</IonItem>
-                        <IonItem>test</IonItem>
-                    </IonList>
-                </IonInfiniteScroll>
-            </IonCardContent>
-        </IonCard >
-    );
-};
+const FileViewerCard: React.FC<FileViewerCardProps> = (props) => (
+    <IonCard className={styles.fileViewerCard}>
+        <IonCardContent className={styles.fileViewerCardContent}>
+            <IonGrid>
+                <IonRow>
+                    <IonCol>
+                        <IonSelect className={styles.selectFile} label={props.dbName} placeholder="Select Testdata">
+                            {props.tests.map(test =>
+                                <IonSelectOption key={test} value={test}>{test}</IonSelectOption>
+                            )}
+                        </IonSelect>
+                    </IonCol>
+                    <IonCol>
+                        <IonButton className={styles.viewBtn}
+                        /* onClick={() => props.setSelectedTest("")} */
+                        >View</IonButton>
+                    </IonCol>
+                </IonRow>
+            </IonGrid>
+
+
+        </IonCardContent>
+    </IonCard >
+);
 
 export default FileViewerCard;
