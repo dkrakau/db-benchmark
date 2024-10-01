@@ -1,11 +1,22 @@
 .fileViewerCard {
+    width: 60rem;
+    height: 40em;
+
     display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
 }
 
-.fileViewerTitleCard {
-    font-size: 12pt;
+.fileViewerCardContent {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
 }
 
-.fileViewerSubtitleCard {
-    font-size: 12pt;
+.selectFile {
+    font-size: 16pt;
 }

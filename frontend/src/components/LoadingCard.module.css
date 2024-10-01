@@ -8,10 +8,16 @@
     justify-content: center;
 }
 
+.loadingDatabaseName {
+    font-size: 20pt;
+    font-weight: bold;
+}
+
 .loadingTitle {
     margin: 0;
     font-size: 20pt;
     font-weight: bold;
+    padding-bottom: 1rem;
 }
 
 .loadingSubtitle {

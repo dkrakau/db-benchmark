@@ -10,12 +10,16 @@ import {
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { informationCircleOutline, layersOutline, readerOutline, settingsOutline } from 'ionicons/icons';
+import { useEffect, useState } from "react";
 import { Redirect, Route } from 'react-router-dom';
+import { LoadingState } from "./components/LoadingCard";
 import HistoryPage from "./pages/HistoryPage";
 import InformationPage from "./pages/InformationPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import SettingsPage from "./pages/SettingsPage";
 import TestingPage from "./pages/TestingPage";
+import milvusLogo from './pics/milvus-logo.png';
+import postgresLogo from './pics/postgres-logo.png';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -45,59 +49,152 @@ import '@ionic/react/css/palettes/dark.class.css';
 /* import '@ionic/react/css/palettes/dark.system.css'; */
 
 /* Theme variables */
+import { useStorage } from "./hooks/useStorage";
 import './theme/variables.css';
-
-
 
 setupIonicReact();
 
-document.documentElement.classList.toggle('ion-palette-dark', false);
+export interface DatabaseData {
+  logo: string,
+  version: string,
+  selected: boolean,
+  state: LoadingState
+}
 
-const App: React.FC = () => (
-  <IonApp>
-    <IonReactRouter>
-      <IonTabs>
-        <IonRouterOutlet>
-          <Route exact path="/testing">
-            <TestingPage />
-          </Route>
-          <Route exact path="/history">
-            <HistoryPage />
-          </Route>
-          <Route exact path="/information">
-            <InformationPage />
-          </Route>
-          <Route path="/settings">
-            <SettingsPage />
-          </Route>
-          <Route exact path="/">
-            <Redirect to="/testing" />
-          </Route>
-          <Route>
-            <NotFoundPage />
-          </Route>
-        </IonRouterOutlet>
-        <IonTabBar slot="bottom">
-          <IonTabButton tab="testing" href="/testing">
-            <IonIcon aria-hidden="true" icon={layersOutline} />
-            <IonLabel>Testing</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="history" href="/history">
-            <IonIcon aria-hidden="true" icon={readerOutline} />
-            <IonLabel>History</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="information" href="/information">
-            <IonIcon aria-hidden="true" icon={informationCircleOutline} />
-            <IonLabel>Information</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="settings" href="/settings">
-            <IonIcon aria-hidden="true" icon={settingsOutline} />
-            <IonLabel>Settings</IonLabel>
-          </IonTabButton>
-        </IonTabBar>
-      </IonTabs>
-    </IonReactRouter>
-  </IonApp>
-);
+const App: React.FC = () => {
+
+  const { settings } = useStorage();
+  const { loadSettings } = useStorage();
+
+  const [queriesTotal, setQueriesTotal] = useState<number>(0);
+  const [cutOff, setCutOff] = useState<number>(0);
+  const [isDarkModeEnabled, setIsDarkModeEnabled] = useState<boolean>(false);
+
+  const [isConfirmed, setIsConfirmed] = useState<boolean>(false);
+  const [selectedDbs, setSelectedDbs] = useState<string[]>([]);
+  const [dbs, setDbs] = useState<Map<string, DatabaseData>>(new Map([
+    [
+      "Milvus",
+      {
+        logo: milvusLogo,
+        version: "2.4.10",
+        selected: false,
+        state: LoadingState.loading,
+      }
+    ],
+    [
+      "Postgres",
+      {
+        logo: postgresLogo,
+        version: "16.4",
+        selected: false,
+        state: LoadingState.loading,
+      }
+    ],
+  ]));
+
+  const updateDbs = (key: string, value: DatabaseData) => {
+    setDbs(new Map(dbs.set(key, value)));
+  }
+
+  const resetPage = async () => {
+    let settings = await loadSettings();
+    setQueriesTotal(settings.queriesTotal);
+    setCutOff(settings.cutOff);
+    setIsDarkModeEnabled(settings.isDarkModeEnabled);
+    setIsConfirmed(false);
+    for (let [dbName, databaseData] of dbs) {
+      if (databaseData?.selected) {
+        databaseData.selected = false;
+        databaseData.state = LoadingState.pending;
+      }
+    }
+  }
+
+  useEffect(() => {
+    if (settings !== undefined) {
+      setQueriesTotal(settings?.queriesTotal);
+      setCutOff(settings?.cutOff);
+      document.documentElement.classList.toggle('ion-palette-dark', settings?.isDarkModeEnabled);
+      setIsDarkModeEnabled(settings?.isDarkModeEnabled);
+    }
+  }, [settings]);
+
+  return (
+    <IonApp>
+      <IonReactRouter>
+        <IonTabs>
+          <IonRouterOutlet>
+            <Route exact path="/testing">
+              <TestingPage
+                queriesTotal={queriesTotal}
+                cutOff={cutOff}
+                isDarkModeEnabled={isDarkModeEnabled}
+                isConfirmed={isConfirmed}
+                setIsConfirmed={setIsConfirmed}
+                selectedDbs={selectedDbs}
+                setSelectedDbs={setSelectedDbs}
+                dbs={dbs}
+                setDbs={setDbs}
+                updateDbs={updateDbs}
+              />
+            </Route>
+            <Route exact path="/history">
+              <HistoryPage
+                queriesTotal={queriesTotal}
+                cutOff={cutOff}
+                isDarkModeEnabled={isDarkModeEnabled}
+                isConfirmed={isConfirmed}
+                setIsConfirmed={setIsConfirmed}
+                selectedDbs={selectedDbs}
+                setSelectedDbs={setSelectedDbs}
+                dbs={dbs}
+                setDbs={setDbs}
+                updateDbs={updateDbs}
+              />
+            </Route>
+            <Route exact path="/information">
+              <InformationPage />
+            </Route>
+            <Route path="/settings">
+              <SettingsPage
+                queriesTotal={queriesTotal}
+                setQueriesTotal={setQueriesTotal}
+                cutOff={cutOff}
+                setCutOff={setCutOff}
+                isDarkModeEnabled={isDarkModeEnabled}
+                setIsDarkModeEnabled={setIsDarkModeEnabled}
+              />
+            </Route>
+            <Route exact path="/">
+              <Redirect to="/testing" />
+            </Route>
+            <Route>
+              <NotFoundPage />
+            </Route>
+          </IonRouterOutlet>
+          <IonTabBar slot="bottom">
+            <IonTabButton tab="testing" href="/testing" onClick={() => resetPage()}>
+              <IonIcon aria-hidden="true" icon={layersOutline} />
+              <IonLabel>Testing</IonLabel>
+            </IonTabButton>
+            <IonTabButton tab="history" href="/history" onClick={() => resetPage()}>
+              <IonIcon aria-hidden="true" icon={readerOutline} />
+              <IonLabel>History</IonLabel>
+            </IonTabButton>
+            <IonTabButton tab="information" href="/information" onClick={() => resetPage()}>
+              <IonIcon aria-hidden="true" icon={informationCircleOutline} />
+              <IonLabel>Information</IonLabel>
+            </IonTabButton>
+            <IonTabButton tab="settings" href="/settings" onClick={() => resetPage()}>
+              <IonIcon aria-hidden="true" icon={settingsOutline} />
+              <IonLabel>Settings</IonLabel>
+            </IonTabButton>
+          </IonTabBar>
+        </IonTabs>
+      </IonReactRouter>
+    </IonApp>
+  );
+}
 
 export default App;
