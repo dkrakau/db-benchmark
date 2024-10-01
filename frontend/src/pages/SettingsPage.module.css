@@ -2,11 +2,33 @@
     display: flex;
 }
 
-.settingsList {
+.grid {
+    width: 80%;
     display: flex;
     flex-direction: column;
+    align-items: left;
+    justify-content: left;
+}
+
+.item {
+    margin: 1rem;
+}
+
+.asRow {
+    display: flex;
+    flex-direction: row;
     align-items: center;
     justify-content: center;
+}
+
+.rangeValue {
+    color: var(--ion-color-primary);
+    font-weight: bold;
+    margin-left: 3rem;
+}
+
+.range {
+    width: 5rem;
 }
 
 .saveBtn {
